@@ -201,11 +201,20 @@ OGLBubbles_BINARY_DIR:STATIC=C:/Users/xpech/Documents/Project/OGLBubbles/build
 //Value Computed by CMake
 OGLBubbles_SOURCE_DIR:STATIC=C:/Users/xpech/Documents/Project/OGLBubbles
 
+//OpenGL library for win32
+OPENGL_gl_LIBRARY:STRING=opengl32
+
+//GLU library for win32
+OPENGL_glu_LIBRARY:STRING=glu32
+
 //Value Computed by CMake
 Project_BINARY_DIR:STATIC=C:/Users/xpech/Documents/Project/OGLBubbles/build
 
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=C:/Users/xpech/Documents/Project/OGLBubbles
+
+//The directory containing a CMake configuration file for glfw3.
+glfw3_DIR:PATH=glfw3_DIR-NOTFOUND
 
 
 ########################
@@ -334,4 +343,10 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding OpenGL
+FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[opengl32][c ][v()]
+//ADVANCED property for variable: OPENGL_gl_LIBRARY
+OPENGL_gl_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENGL_glu_LIBRARY
+OPENGL_glu_LIBRARY-ADVANCED:INTERNAL=1
 

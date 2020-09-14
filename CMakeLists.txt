@@ -8,7 +8,9 @@ configure_file(src/OGLBConfig.h.in src/OGLBConfig.h)
 #set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 include_directories(include)
-
+#target_link_libraries(OGLBubbles glfw)
+#find_package(OpenGL REQUIRED)
+#target_link_libraries(OGLBubbles OpenGL::GL)
 
 
 add_executable(OGLBubbles

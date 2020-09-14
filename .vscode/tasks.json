@@ -13,8 +13,8 @@
                 "/link",
                 "/MACHINE:X64",
                 "/LIBPATH:${workspaceFolder}\\lib",
-                "GLFW\\glfw3dll.lib",
-                "GLFW\\glfw3.dll"
+                "GLFW\\glfw3.lib",
+                "GLFW\\glfw3dll.lib"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

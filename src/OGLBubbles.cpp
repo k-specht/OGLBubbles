@@ -1,24 +1,30 @@
+#define GLFW_DLL
+#define GLFW_INCLUDE_NONE
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include "OGLBubbles.h"
 
 #include <iostream>
 
 // Current issue: exit code 0xc0000135
 // If adding the library to the command line linker isn't your thing, uncomment this:
-//#pragma comment(lib,"glfw3dll.lib")
+//#pragma comment(lib,"GLFW\\glfw3.lib")
 
-using namespace std;
+//using namespace std;
+//#using <GLFW/glfw3.dll>
 
 int main()
 {
     // Initialize
     std::cout << "Hello World!";
+    
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Create the window
     GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
@@ -29,6 +35,6 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-
+    
     return 0;
 }
