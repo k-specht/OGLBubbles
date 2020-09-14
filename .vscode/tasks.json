@@ -9,6 +9,7 @@
                 "/EHsc",
                 "/Fe:${workspaceFolder}\\bin\\${fileBasenameNoExtension}.exe",
                 "${workspaceFolder}\\src\\*.cpp",
+                "${workspaceFolder}\\src\\*.c",
                 "/I.\\include",
                 "/link",
                 "/MACHINE:X64",
