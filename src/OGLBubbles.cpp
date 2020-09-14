@@ -8,13 +8,10 @@
 
 #include <iostream>
 
-// Current issue: exit code 0xc0000135
-// If adding the library to the command line linker isn't your thing, uncomment this:
-//#pragma comment(lib,"GLFW\\glfw3.lib")
-
-//using namespace std;
-//#using <GLFW/glfw3.dll>
-
+/**
+ *  Entry point to the app.
+ *  Note that for the app to run, all dll files must be in the same directory as the exe file.
+ */
 int main()
 {
     // Initialize
