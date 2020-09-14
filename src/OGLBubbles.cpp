@@ -19,11 +19,11 @@
  *  @version 1.0 09/14/2020
  */
 
-// Global variables
+// Global pointer to the graphics object
 Graphics* Gfx;
 
 /**
- *  Updates the viewport to the new size of the window's frame.
+ *  Updates the viewport to the new size of the window's frame. Might need to move to Graphics at some point.
  *  @param window - The window whose frame changed.
  *  @param width  - The width of the new frame size.
  *  @param height - The height of the new frame size.
@@ -34,12 +34,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 /**
- *  Processes any inputs given to the window.
- *  @param window - The window whose inputs need to be checked.
- */
-
-
-/**
  *  Entry point to the app.
  *  This function initiates the window and attaches a Graphics object.
  *  Note that for the app to run, all dll files must be in the same directory as the exe file.
@@ -48,8 +42,8 @@ int main()
 {
     // Initialize window
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.0);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
@@ -85,15 +79,16 @@ int main()
         // Process any inputs
         Gfx->ProcessInput();
 
-        // Add rendering commands here!
-
         // Clears the buffer to the specified color (aka, background color)
-        Gfx->ClearBuffer(0.2f, 0.3f, 0.3f, 1.0f);
+        Gfx->ClearBuffer(0.0f, 0.0f, 0.0f, 1.0f);
+
+        // Draws a triangle to the screen
+        Gfx->DrawTriangle();
 
         // Swaps the front and back buffers
         Gfx->EndFrame();
 
-        // Processes any pending events, like mouse movement
+        // Processes any pending events in the queue
         glfwPollEvents();    
     }
 

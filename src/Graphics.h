@@ -46,6 +46,9 @@ public:
         float alpha
     );
 
+    /**
+     *  Draws a triangle to the screen using the graphics pipeline.
+     */
     void DrawTriangle();
 
     /**
