@@ -5,8 +5,21 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include "OGLBubbles.h"
+#include "Graphics.h"
+#include "HelperStructs.h"
 
 #include <iostream>
+
+/**
+ *  OGLBubbles
+ *  A program that generates cool bubbles to a window!
+ *  TODO Rearrange this messy, messy file.
+ *  @author Käthe Specht
+ *  @version 1.0 09/14/2020
+ */
+
+// Global variables
+Graphics* Gfx;
 
 /**
  *  Updates the viewport to the new size of the window's frame.
@@ -20,14 +33,19 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 /**
+ *  Processes any inputs given to the window.
+ *  @param window - The window whose inputs need to be checked.
+ */
+
+
+/**
  *  Entry point to the app.
+ *  This function initiates the window and attaches a Graphics object.
  *  Note that for the app to run, all dll files must be in the same directory as the exe file.
  */
 int main()
 {
-    // Initialize
-    std::cout << "Hello World!";
-    
+    // Initialize window
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.0);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.0);
@@ -53,6 +71,9 @@ int main()
     // Sets the default viewport size
     glViewport(0, 0, 800, 600);
 
+    // Creates the window's graphics object
+    Gfx = new Graphics(window);
+
     // When the frame size changes, this calls a function to update it
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
 
@@ -60,14 +81,23 @@ int main()
     // Loops while the window is open so graphics keep being drawn
     while(!glfwWindowShouldClose(window))
     {
+        // Process any inputs
+        Gfx->ProcessInput();
+
+        // Add rendering commands here!
+
+        // Clears the buffer to the specified color (aka, background color)
+        Color color = { 0.2f, 0.3f, 0.3f, 1.0f};
+        Gfx->ClearBuffer(color);
+
         // Swaps the front and back buffers
-        glfwSwapBuffers(window);
+        Gfx->EndFrame();
 
         // Processes any pending events, like mouse movement
         glfwPollEvents();    
     }
 
     // Clean up all drawing resources before exiting the program
-    glfwTerminate();
+    Gfx->Close();
     return 0;
 }
