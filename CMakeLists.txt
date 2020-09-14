@@ -4,11 +4,8 @@ project(OGLBubbles)
 configure_file(src/OGLBConfig.h.in src/OGLBConfig.h)
 
 
-
-
-
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 include_directories(include)
 
