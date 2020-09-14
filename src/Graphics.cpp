@@ -1,3 +1,7 @@
+#ifndef GLFW_DLL
+#define GLFW_DLL
+#endif
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
@@ -9,9 +13,9 @@ Graphics::Graphics(GLFWwindow* wnd)
     window = wnd;
 };
 
-void Graphics::ClearBuffer(Color color)
+void Graphics::ClearBuffer(float red, float green, float blue, float alpha)
 {
-    glClearColor(color.red, color.green, color.blue, color.alpha);
+    glClearColor(red, green, blue, alpha);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 

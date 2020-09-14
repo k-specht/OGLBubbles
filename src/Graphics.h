@@ -1,8 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "HelperStructs.h"
-
 class Graphics
 {
 public:
@@ -36,9 +34,17 @@ public:
 
     /**
      *  Clears the draw buffer using the specified color.
-     *  @param color - The four-channel color vector to clear the buffer with. Channel 4 is alpha.
+     *  @param red   - The red channel of this color.
+     *  @param green - The green channel of this color.
+     *  @param blue  - The blue channel of this color.
+     *  @param alpha - The alpha channel of this color.
      */
-    void ClearBuffer(Color color) noexcept;
+    void ClearBuffer(
+        float red,
+        float blue,
+        float green,
+        float alpha
+    );
 
     void DrawTriangle();
 

@@ -1,4 +1,6 @@
+#ifndef GLFW_DLL
 #define GLFW_DLL
+#endif
 
 
 #include <glad/glad.h>
@@ -6,7 +8,6 @@
 #include <GLFW/glfw3native.h>
 #include "OGLBubbles.h"
 #include "Graphics.h"
-#include "HelperStructs.h"
 
 #include <iostream>
 
@@ -87,8 +88,7 @@ int main()
         // Add rendering commands here!
 
         // Clears the buffer to the specified color (aka, background color)
-        Color color = { 0.2f, 0.3f, 0.3f, 1.0f};
-        Gfx->ClearBuffer(color);
+        Gfx->ClearBuffer(0.2f, 0.3f, 0.3f, 1.0f);
 
         // Swaps the front and back buffers
         Gfx->EndFrame();
