@@ -4,11 +4,11 @@
     <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\OGLBubbles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\include\glad\glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\include\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\include\GLFW\glfw3.h">
       <Filter>Header Files</Filter>
     </ClInclude>

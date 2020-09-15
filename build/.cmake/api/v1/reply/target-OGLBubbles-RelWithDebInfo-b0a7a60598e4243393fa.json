@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Release/OGLBubbles.exe"
+			"path" : "RelWithDebInfo/OGLBubbles.exe"
 		},
 		{
-			"path" : "Release/OGLBubbles.pdb"
+			"path" : "RelWithDebInfo/OGLBubbles.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -52,7 +52,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /O2 /Ob2 /DNDEBUG -MD  "
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /Zi /O2 /Ob1 /DNDEBUG -MD  "
 				}
 			],
 			"includes" : 
@@ -71,30 +71,6 @@
 			[
 				0
 			]
-		},
-		{
-			"compileCommandFragments" : 
-			[
-				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /MD /O2 /Ob2 /DNDEBUG -MD  "
-				}
-			],
-			"includes" : 
-			[
-				{
-					"backtrace" : 2,
-					"path" : "C:/Users/xpech/Documents/Project/OGLBubbles/include"
-				},
-				{
-					"backtrace" : 3,
-					"path" : "C:/Users/xpech/Documents/Project/OGLBubbles/build"
-				}
-			],
-			"language" : "C",
-			"sourceIndexes" : 
-			[
-				1
-			]
 		}
 	],
 	"dependencies" : 
@@ -109,11 +85,11 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /O2 /Ob2 /DNDEBUG -MD",
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /Zi /O2 /Ob1 /DNDEBUG -MD",
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/machine:x64 /INCREMENTAL:NO /subsystem:console",
+				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
 				"role" : "flags"
 			},
 			{
@@ -136,14 +112,14 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0,
-				1
+				0
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
+				1,
 				2
 			]
 		}
@@ -158,9 +134,8 @@
 		},
 		{
 			"backtrace" : 1,
-			"compileGroupIndex" : 1,
-			"path" : "include/glad/glad.c",
-			"sourceGroupIndex" : 0
+			"path" : "include/glad/glad.h",
+			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 1,

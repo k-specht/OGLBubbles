@@ -71,30 +71,6 @@
 			[
 				0
 			]
-		},
-		{
-			"compileCommandFragments" : 
-			[
-				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /MD /O1 /Ob1 /DNDEBUG -MD  "
-				}
-			],
-			"includes" : 
-			[
-				{
-					"backtrace" : 2,
-					"path" : "C:/Users/xpech/Documents/Project/OGLBubbles/include"
-				},
-				{
-					"backtrace" : 3,
-					"path" : "C:/Users/xpech/Documents/Project/OGLBubbles/build"
-				}
-			],
-			"language" : "C",
-			"sourceIndexes" : 
-			[
-				1
-			]
 		}
 	],
 	"dependencies" : 
@@ -136,14 +112,14 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0,
-				1
+				0
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
+				1,
 				2
 			]
 		}
@@ -158,9 +134,8 @@
 		},
 		{
 			"backtrace" : 1,
-			"compileGroupIndex" : 1,
-			"path" : "include/glad/glad.c",
-			"sourceGroupIndex" : 0
+			"path" : "include/glad/glad.h",
+			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 1,

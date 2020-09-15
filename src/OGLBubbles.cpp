@@ -80,10 +80,18 @@ int main()
         Gfx->ProcessInput();
 
         // Clears the buffer to the specified color (aka, background color)
-        Gfx->ClearBuffer(0.0f, 0.0f, 0.0f, 1.0f);
+        Gfx->ClearBuffer(1.0f, 1.0f, 1.0f, 1.0f);
 
-        // Draws a triangle to the screen
-        Gfx->DrawTriangle();
+        // Draw a triangle! Note that the thrown exception is caught so that the debug window prints related info
+        try
+        {
+            Gfx->DrawTriangle();
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            return -1;
+        }
 
         // Swaps the front and back buffers
         Gfx->EndFrame();
