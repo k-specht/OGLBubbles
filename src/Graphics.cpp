@@ -15,18 +15,25 @@ using namespace std;
 // Vertex Shader (update this when modifying VertexShader.GLSL)
 const char *vertexShaderSource = "#version 420 core\n"
 "layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec3 aColor;\n"
+
+"out vec3 vColor;\n"
+
 "void main()\n"
 "{\n"
 "    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"    vColor = aColor;\n"
 "}\0";
 
 // Pixel Shader (update this when modifying PixelShader.GLSL)
 const char *pixelShaderSource = "#version 420 core\n"
 "out vec4 PixelColor;\n"
-"uniform vec4 timeColor;\n"
+
+"in vec3 vColor;\n"
+
 "void main()\n"
 "{\n"
-"    PixelColor = vec4(0.9f, timeColor.y, 0.9f, 1.0f);\n"
+"    PixelColor = vec4( vColor, 1.0f );\n"
 "}\0";
 
 Graphics::Graphics(GLFWwindow* wnd)
@@ -119,9 +126,9 @@ void Graphics::CreateShaders()
     glDeleteShader(pixelShader);
 }
 
-void Graphics::GenerateRectangle()
+void Graphics::GenerateRectangle(int index)
 {
-    // Create vertices to be used
+    // Step 1. Create the object data and generate buffers
     float vertices[] = 
     {
      0.5f,  0.5f, 0.0f,  // top right
@@ -135,93 +142,91 @@ void Graphics::GenerateRectangle()
         1, 2, 3    // second triangle
     };
 
-    // Creates and binds input buffer
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    EBOs[0] = EBO;
-
     // Generates and binds a vertex buffer, then copies data to it
     unsigned int VBO;
     glGenBuffers(1, &VBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Specifies how OpenGL should interpret the buffer data (check above for matching details)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
     // Adds all the defined data into a vertex array object (note that you can make an array of these)
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    VAOs[1] = VAO;
+    VAOs[index] = VAO;
 
-
-    // Init process, should be same for any drawn object
-    // 1. binds Vertex Array Object
-    glBindVertexArray(VAOs[1]);
-    // 2. copies the vertices array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // 3. sets the vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-}
-
-void Graphics::GenerateTriangle()
-{
-    // Create the vertices to be used
-    float vertices[] = 
-    {
-        // x     y     z
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
-    };
-
-    /*Unused for current triangle
     // Input element buffer
     unsigned int EBO;
     glGenBuffers(1, &EBO);
+    EBOs[index] = EBO;
 
-    // Binds buffer
+    // Step 2. Copy the data into buffers and bind them to the current VAO
+    glBindVertexArray(VAOs[index]);
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    */
+    
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+    // Step 3. Set the vertex attribute pointers and enable them
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+}
+
+void Graphics::GenerateTriangle(int index)
+{
+    // Step 1: Create the data for the object and generate buffers
+    float vertices[] = 
+    {
+        // x     y     z     r     g     b
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    unsigned int indices[] = 
+    {
+        0, 1, 2
+    };
 
     // Generates and binds a vertex buffer, then copies data to it
     unsigned int VBO;
     glGenBuffers(1, &VBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Specifies how OpenGL should interpret the buffer data (check above for matching details)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
     // Adds all the defined data into a vertex array object (note that you can make an array of these)
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    VAOs[0] = VAO;
+    VAOs[index] = VAO;
 
+    // Input element buffer
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    EBOs[index] = EBO;
 
-    // Init process, should be same for any drawn object
-    // 1. binds Vertex Array Object
-    glBindVertexArray(VAOs[0]);
-    // 2. copies the vertices array in a buffer for OpenGL to use
+    // Step 2. Copy the data into buffers and bind them to the current VAO
+    glBindVertexArray(VAOs[index]);
+
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // 3. sets the vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+    // Step 3. Set the vertex attribute pointers and enable them
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
 }
 
-void Graphics::DrawTriangle()
+void Graphics::DrawTriangle(int index)
 {
+    // Step 4: Bind a VAO and draw the object
+
     // Send color data to the pixel shader c:
     // Note that if you want to keep this idea, change sin to dot product
     float time = glfwGetTime();
@@ -231,15 +236,18 @@ void Graphics::DrawTriangle()
     // The final part of the process, this should be done in the render loop
     glUseProgram(shaders[0]);
     glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
-    glBindVertexArray(VAOs[0]);
+    glBindVertexArray(VAOs[index]);
+    
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[0]);
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[index]);
+    //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
-void Graphics::DrawRectangle()
+void Graphics::DrawRectangle(int index)
 {
+    // Step 4. Bind a VAO and draw the object
+
     // Send color data to the pixel shader c:
     // Note that if you want to keep this idea, change sin to dot product
     float time = glfwGetTime();
@@ -249,10 +257,9 @@ void Graphics::DrawRectangle()
     // The final part of the process, this should be done in the render loop
     glUseProgram(shaders[0]);
     glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
-    glBindVertexArray(VAOs[1]);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(VAOs[index]);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[0]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[index]);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 

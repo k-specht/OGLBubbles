@@ -53,23 +53,27 @@ public:
 
     /**
      *  Generates bindables for a Triangle.
+     *  @param index - The index of the VAO for this drawable object.
      */
-    void GenerateTriangle();
+    void GenerateTriangle(int index);
 
     /**
      *  Generates bindables for a Rectangle.
+     *  @param index - The index of the VAO for this drawable object.
      */
-    void GenerateRectangle();
+    void GenerateRectangle(int index);
 
     /**
      *  Draws a triangle to the screen using the graphics pipeline.
+     *  @param index - The index of the VAO for this drawable object.
      */
-    void DrawTriangle();
+    void DrawTriangle(int index);
 
     /**
      *  Draws a triangle to the screen using the graphics pipeline.
+     *  @param index - The index of the VAO for this drawable object.
      */
-    void DrawRectangle();
+    void DrawRectangle(int index);
 
     /**
      *  Processes any inputs given to the window this Graphics instance is attached to.

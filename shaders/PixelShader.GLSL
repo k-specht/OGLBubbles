@@ -1,9 +1,11 @@
 #version 420 core
 out vec4 PixelColor;
 
-uniform vec4 timeColor;
+//uniform vec4 timeColor;
+
+in vec3 vColor;
 
 void main()
 {
-    PixelColor = vec4(1.0f, timeColor.y, 0.2f, 1.0f);
+    PixelColor = vec4( vColor, 1.0f );
 }

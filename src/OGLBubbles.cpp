@@ -79,8 +79,11 @@ int main()
 
     // Loads reusable graphics
     Gfx->CreateShaders();
-    Gfx->GenerateTriangle();
-    Gfx->GenerateRectangle();
+    Gfx->GenerateTriangle(0);
+    //Gfx->GenerateRectangle(1);
+
+    // Polygon Mode :)
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     // Loops while the window is open so graphics keep being drawn
     while(!glfwWindowShouldClose(window))
@@ -94,7 +97,7 @@ int main()
         // Draw a triangle! Note that the thrown exception is caught so that the debug window prints related info
         try
         {
-            Gfx->DrawRectangle();
+            Gfx->DrawTriangle(0);
         }
         catch(const std::exception& e)
         {
