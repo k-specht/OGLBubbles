@@ -47,9 +47,29 @@ public:
     );
 
     /**
+     *  Creates shader resources to use during rendering.
+     */
+    void CreateShaders();
+
+    /**
+     *  Generates bindables for a Triangle.
+     */
+    void GenerateTriangle();
+
+    /**
+     *  Generates bindables for a Rectangle.
+     */
+    void GenerateRectangle();
+
+    /**
      *  Draws a triangle to the screen using the graphics pipeline.
      */
     void DrawTriangle();
+
+    /**
+     *  Draws a triangle to the screen using the graphics pipeline.
+     */
+    void DrawRectangle();
 
     /**
      *  Processes any inputs given to the window this Graphics instance is attached to.
@@ -74,4 +94,10 @@ private:
 
     // Pointer to this Graphics object's shader program array
     unsigned int* shaders;
+
+    // Pointer to this Graphics object's Vertex Array Object array
+    unsigned int* VAOs;
+
+    // Pointer to this Graphics object's Element Buffer Object array
+    unsigned int* EBOs;
 };

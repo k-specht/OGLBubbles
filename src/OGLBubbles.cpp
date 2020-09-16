@@ -41,7 +41,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 int main()
 {
     // Initialize window
-    glfwInit();
+    if(glfwInit() == GLFW_FALSE)
+    {
+        std::cout << "GLFW Initialization failed! Check include paths and library/dll locations." << std::endl;
+        return -1;
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -72,6 +76,11 @@ int main()
     // When the frame size changes, this calls a function to update it
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
 
+
+    // Loads reusable graphics
+    Gfx->CreateShaders();
+    Gfx->GenerateTriangle();
+    Gfx->GenerateRectangle();
     
     // Loops while the window is open so graphics keep being drawn
     while(!glfwWindowShouldClose(window))
@@ -85,7 +94,7 @@ int main()
         // Draw a triangle! Note that the thrown exception is caught so that the debug window prints related info
         try
         {
-            Gfx->DrawTriangle();
+            Gfx->DrawRectangle();
         }
         catch(const std::exception& e)
         {
