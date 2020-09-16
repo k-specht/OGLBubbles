@@ -23,14 +23,18 @@ const char *vertexShaderSource = "#version 420 core\n"
 // Pixel Shader (update this when modifying PixelShader.GLSL)
 const char *pixelShaderSource = "#version 420 core\n"
 "out vec4 PixelColor;\n"
+"uniform vec4 timeColor;\n"
 "void main()\n"
 "{\n"
-"    PixelColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"    PixelColor = vec4(0.9f, timeColor.y, 0.9f, 1.0f);\n"
 "}\0";
 
 Graphics::Graphics(GLFWwindow* wnd)
 {
-    window = wnd;
+    Graphics::window = wnd;
+
+    // Initializes shader array to the default max size
+    shaders = new unsigned int [6];
 };
 
 void Graphics::ClearBuffer(float red, float green, float blue, float alpha)
@@ -54,13 +58,35 @@ void Graphics::ProcessInput()
 void Graphics::DrawTriangle()
 {
     // Create the vertices to be used
-    float vertices[] = 
+    /*float vertices[] = 
     {
         // x     y     z
         -0.5f, -0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
          0.0f,  0.5f, 0.0f
+    };*/
+
+    // Create input layout
+    float vertices[] = 
+    {
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
     };
+    unsigned int indices[] = 
+    {
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    };
+
+    // Input element buffer
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+
+    // Binds buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Generates a buffer and assigns its unique id to VBO
     unsigned int VBO;
@@ -115,6 +141,7 @@ void Graphics::DrawTriangle()
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, pixelShader);
     glLinkProgram(shaderProgram);
+    shaders[0] = shaderProgram;
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 
@@ -148,12 +175,26 @@ void Graphics::DrawTriangle()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // Send color data to the pixel shader c:
+    // Note that if you want to keep this idea, change sin to dot product
+    float time = glfwGetTime();
+    float colorValue = (sin(time)/2.0f) + 0.5f;
+    int vertexColorLocation = glGetUniformLocation(shaderProgram, "timeColor");
+
     // The final part of the process, this should be done in the render loop
     glUseProgram(shaderProgram);
+    glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+void Graphics::SetMaxSize(int size)
+{
+    Graphics::maxSize = size;
+}
 
 void Graphics::Close()
 {

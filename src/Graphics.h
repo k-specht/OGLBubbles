@@ -57,10 +57,21 @@ public:
     void ProcessInput();
 
     /**
+     *  Sets the maximum shader capacity.
+     */
+    void SetMaxSize(int size);
+
+    /**
      *  Closes any remaining graphics resources attached to the active window.
      */
     void Close();
 private:
     // A pointer to the window this Graphics instance paints to
     GLFWwindow* window;
+
+    // The maximum shader capacity of this graphics object (defaults to 6)
+    int maxSize;
+
+    // Pointer to this Graphics object's shader program array
+    unsigned int* shaders;
 };
