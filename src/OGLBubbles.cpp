@@ -70,20 +70,23 @@ int main()
     // Sets the default viewport size
     glViewport(0, 0, 800, 600);
 
-    // Creates the window's graphics object
-    Gfx = new Graphics(window);
-
     // When the frame size changes, this calls a function to update it
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
 
-
+    // Creates the window's graphics object
+    Gfx = new Graphics(window);
+    
     // Loads reusable graphics
-    Gfx->CreateShaders();
-    Gfx->GenerateTriangle(0);
-    //Gfx->GenerateRectangle(1);
-
-    // Polygon Mode :)
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    try
+    {
+        Gfx->CreateShaders();
+        Gfx->GenerateTriangle(0);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return -1;
+    }
     
     // Loops while the window is open so graphics keep being drawn
     while(!glfwWindowShouldClose(window))

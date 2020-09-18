@@ -1,7 +1,5 @@
-//#include <iostream>
-
-//using namespace std;
-
+#ifndef BUBBLEERROR_H
+#define BUBBLEERROR_H
 #include <stdexcept>
 
 class BubbleError: virtual public std::runtime_error {
@@ -49,3 +47,5 @@ public:
     }
 
 };
+
+#endif

@@ -9,32 +9,10 @@
 #include "Graphics.h"
 #include "BubbleError.h"
 #include <iostream>
+#include "Shader.h"
+#include <vector>
 
 using namespace std;
-
-// Vertex Shader (update this when modifying VertexShader.GLSL)
-const char *vertexShaderSource = "#version 420 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 aColor;\n"
-
-"out vec3 vColor;\n"
-
-"void main()\n"
-"{\n"
-"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"    vColor = aColor;\n"
-"}\0";
-
-// Pixel Shader (update this when modifying PixelShader.GLSL)
-const char *pixelShaderSource = "#version 420 core\n"
-"out vec4 PixelColor;\n"
-
-"in vec3 vColor;\n"
-
-"void main()\n"
-"{\n"
-"    PixelColor = vec4( vColor, 1.0f );\n"
-"}\0";
 
 Graphics::Graphics(GLFWwindow* wnd)
 {
@@ -42,7 +20,7 @@ Graphics::Graphics(GLFWwindow* wnd)
 
     // Initializes shader array to the default max size
     maxSize = 6;
-    shaders = new unsigned int [maxSize];
+    shaders.resize(maxSize);
     VAOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
 };
@@ -67,63 +45,8 @@ void Graphics::ProcessInput()
 
 void Graphics::CreateShaders()
 {
-    // Shader generation (vertex)
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-
-    int  success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-    if(!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED" << std::endl;
-        throw BubbleError(infoLog, 512, 0);
-    }
-
-    // Shader generation (pixel)
-    unsigned int pixelShader;
-    pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(pixelShader, 1, &pixelShaderSource, NULL);
-    glCompileShader(pixelShader);
-
-    glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &success);
-
-    if(!success)
-    {
-        glGetShaderInfoLog(pixelShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PIXEL::COMPILATION_FAILED" << std::endl;
-        throw BubbleError(infoLog, 512, 0);
-    }
-
-    // Creates shader program from the two compiled shaders
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, pixelShader);
-    glLinkProgram(shaderProgram);
-    Graphics::shaders[0] = shaderProgram;
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-
-    if(!success) 
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED" << std::endl;
-        throw BubbleError(infoLog, 512, 0);
-    }
-
-    // Every shader/rendering call from here on will use the compiled shader program
-    glUseProgram(Graphics::shaders[0]);
-    glDeleteShader(vertexShader);
-    glDeleteShader(pixelShader);
+    shaders.push_back(new Shader(".\\shaders\\VertexShader.GLSL", ".\\shaders\\PixelShader.GLSL"));
+    shaders.back()->use();
 }
 
 void Graphics::GenerateRectangle(int index)
@@ -231,10 +154,10 @@ void Graphics::DrawTriangle(int index)
     // Note that if you want to keep this idea, change sin to dot product
     float time = glfwGetTime();
     float colorValue = (sin(time)/2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaders[0], "timeColor");
+    int vertexColorLocation = glGetUniformLocation(shaders.back()->ID, "timeColor");
 
     // The final part of the process, this should be done in the render loop
-    glUseProgram(shaders[0]);
+    glUseProgram(shaders.back()->ID);
     glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
     
@@ -252,10 +175,10 @@ void Graphics::DrawRectangle(int index)
     // Note that if you want to keep this idea, change sin to dot product
     float time = glfwGetTime();
     float colorValue = (sin(time)/2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaders[0], "timeColor");
+    int vertexColorLocation = glGetUniformLocation(shaders.back()->ID, "timeColor");
 
     // The final part of the process, this should be done in the render loop
-    glUseProgram(shaders[0]);
+    glUseProgram(shaders.back()->ID);
     glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
 

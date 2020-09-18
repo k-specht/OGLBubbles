@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "Shader.h"
+
+#include <vector>
 
 class Graphics
 {
@@ -96,8 +99,8 @@ private:
     // The maximum shader capacity of this graphics object (defaults to 6)
     int maxSize;
 
-    // Pointer to this Graphics object's shader program array
-    unsigned int* shaders;
+    // This Graphics object's shader vector; holds shader programs for OpenGL
+    std::vector<Shader*> shaders;
 
     // Pointer to this Graphics object's Vertex Array Object array
     unsigned int* VAOs;
