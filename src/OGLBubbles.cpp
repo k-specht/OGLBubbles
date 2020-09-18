@@ -65,7 +65,7 @@ int main()
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
-    } 
+    }
 
     // Sets the default viewport size
     glViewport(0, 0, 800, 600);
