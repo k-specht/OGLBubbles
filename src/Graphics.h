@@ -9,6 +9,7 @@ class Graphics
 public:
     /**
      *  Initializes a Graphics object for the given window which will handle OpenGL drawing.
+     *  TODO: Organize this class's functions in a more meaningful manner.
      *  @param window - A pointer to the GLFW window you wish to attach Graphics to.
      */
     Graphics(GLFWwindow* window);
@@ -55,6 +56,21 @@ public:
     void CreateShaders();
 
     /**
+     *  Activates the last shader entered into the shader list.
+     */
+    void UseShader();
+
+    /**
+     *  Creates matrix transformations.
+     *  @param width - The screen width.
+     *  @param height - The screen height.
+     */
+    void Transform(
+        float width,
+        float height
+    );
+
+    /**
      *  Generates bindables for a Triangle.
      *  @param index - The index of the VAO for this drawable object.
      */
@@ -65,6 +81,18 @@ public:
      *  @param index - The index of the VAO for this drawable object.
      */
     void GenerateRectangle(int index);
+
+    /**
+     *  Generates bindables for a Cube.
+     *  @param index - The index of the VAO for this drawable object.
+     */
+    void GenerateCube(int index);
+
+    /**
+     *  Draws a cube to the screen using the graphics pipeline.
+     *  @param index - The index of the VAO for this drawable object.
+     */
+    void DrawCube(int index);
 
     /**
      *  Draws a triangle to the screen using the graphics pipeline.

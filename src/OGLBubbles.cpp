@@ -15,6 +15,7 @@
  *  OGLBubbles
  *  A program that generates cool bubbles to a window!
  *  TODO Rearrange this messy, messy file.
+ *  Note: If you want to work with textures, add the SAIL library: https://github.com/smoked-herring/sail
  *  @author Käthe Specht
  *  @version 1.0 09/14/2020
  */
@@ -49,7 +50,9 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
 
     // Create the window and sets it as the current context
     GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
@@ -69,6 +72,7 @@ int main()
 
     // Sets the default viewport size
     glViewport(0, 0, 800, 600);
+    glEnable(GL_DEPTH_TEST);
 
     // When the frame size changes, this calls a function to update it
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
@@ -80,7 +84,8 @@ int main()
     try
     {
         Gfx->CreateShaders();
-        Gfx->GenerateTriangle(0);
+        //Gfx->GenerateTriangle(0);
+        Gfx->GenerateCube(0);
     }
     catch(const std::exception& e)
     {
@@ -96,11 +101,16 @@ int main()
 
         // Clears the buffer to the specified color (aka, background color)
         Gfx->ClearBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw a triangle! Note that the thrown exception is caught so that the debug window prints related info
         try
         {
-            Gfx->DrawTriangle(0);
+            // create transformations
+            Gfx->Transform(800.0f, 600.0f);
+
+            //Gfx->DrawTriangle(0);
+            Gfx->DrawCube(0);
         }
         catch(const std::exception& e)
         {
