@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Shader.h"
+#include "Sphere.h"
 
 #include <vector>
 
@@ -10,6 +11,7 @@ public:
     /**
      *  Initializes a Graphics object for the given window which will handle OpenGL drawing.
      *  TODO: Organize this class's functions in a more meaningful manner.
+     *  TODO: Implement the display lists in the tutorial for Chapter 7: https://www.opengl.org.ru/docs/pg/0208.html
      *  @param window - A pointer to the GLFW window you wish to attach Graphics to.
      */
     Graphics(GLFWwindow* window);
@@ -89,6 +91,18 @@ public:
     void GenerateCube(int index);
 
     /**
+     *  Generates bindables for a Sphere.
+     *  @param index - The index of the VAO for this drawable object.
+     */
+    void GenerateSphere(int index);
+
+    /**
+     *  Draws a sphere to the screen using the graphics pipeline.
+     *  @param index - The index of the VAO for this drawable object.
+     */
+    void DrawSphere(int index);
+
+    /**
      *  Draws a cube to the screen using the graphics pipeline.
      *  @param index - The index of the VAO for this drawable object.
      */
@@ -135,4 +149,7 @@ private:
 
     // Pointer to this Graphics object's Element Buffer Object array
     unsigned int* EBOs;
+
+    // Pointer to this Graphics object's sphere object (TODO: change this to generated shapes array)
+    Sphere* sphere;
 };

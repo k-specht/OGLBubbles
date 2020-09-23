@@ -28,6 +28,7 @@ Graphics::Graphics(GLFWwindow* wnd)
     shaders.resize(maxSize);
     VAOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
+    sphere = new Sphere(1.0f);
 };
 
 void Graphics::ClearBuffer(float red, float green, float blue, float alpha)
@@ -236,6 +237,68 @@ void Graphics::GenerateCube(int index)
     glEnableVertexAttribArray(1);
 }
 
+void Graphics::GenerateSphere(int index)
+{
+    // Get icosahedron data from the sphere object
+    std::vector <float> vertices = sphere->GetVertices();
+    std::vector <unsigned int> indices = sphere->GetIndices();
+    
+    // Divide the icosahedron into a more spherical object
+    //sphere->Divide();
+
+    unsigned int oldSize = vertices.size();
+    unsigned int oldSize2 = indices.size();
+    vertices = sphere->GetVertices();
+    indices = sphere->GetIndices();
+
+    std::cout << "New vertices size (was " << oldSize << "): " << vertices.size() << std::endl;
+    std::cout << "New indices size (was " << oldSize2 << "): " << indices.size() << std::endl;
+
+    // Following is the typical OpenGL generation
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    VAOs[index] = VAO;
+
+    // Input element buffer
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    EBOs[index] = EBO;
+
+    // Step 2. Copy the data into buffers and bind them to the current VAO
+    glBindVertexArray(VAOs[index]);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices.front()), static_cast<void*>(indices.data()), GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices.front()), static_cast<void*>(vertices.data()), GL_STATIC_DRAW);
+
+
+    // Step 3. Set the vertex attribute pointers and enable them
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3* sizeof(float)));
+    //glEnableVertexAttribArray(1);
+}
+
+void Graphics::DrawSphere(int index)
+{
+    // The final part of the process, this should be done in the render loop
+    glUseProgram(shaders.back()->ID);
+    //glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
+    glBindVertexArray(VAOs[index]);
+    
+    //glDrawArrays(GL_TRIANGLES, 0, 12);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[index]);
+    glDrawElements(GL_TRIANGLES, 420, GL_UNSIGNED_INT, 0);
+}
+
 void Graphics::DrawCube(int index)
 {
     // Step 4: Bind a VAO and draw the object
@@ -313,16 +376,20 @@ void Graphics::Transform(float width, float height)
     glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
     glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
+
     //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-    view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
     projection = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
+
     // retrieve the matrix uniform locations
     unsigned int modelLoc = glGetUniformLocation(shaders.back()->ID, "model");
     unsigned int viewLoc  = glGetUniformLocation(shaders.back()->ID, "view");
+
     // pass them to the shaders (3 different ways)
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+    
     // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
     glUniformMatrix4fv(glGetUniformLocation(shaders.back()->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
 }

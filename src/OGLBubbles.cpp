@@ -79,13 +79,15 @@ int main()
 
     // Creates the window's graphics object
     Gfx = new Graphics(window);
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     
     // Loads reusable graphics
     try
     {
         Gfx->CreateShaders();
         //Gfx->GenerateTriangle(0);
-        Gfx->GenerateCube(0);
+        //Gfx->GenerateCube(0);
+        Gfx->GenerateSphere(0);
     }
     catch(const std::exception& e)
     {
@@ -110,7 +112,8 @@ int main()
             Gfx->Transform(800.0f, 600.0f);
 
             //Gfx->DrawTriangle(0);
-            Gfx->DrawCube(0);
+            //Gfx->DrawCube(0);
+            Gfx->DrawSphere(0);
         }
         catch(const std::exception& e)
         {
