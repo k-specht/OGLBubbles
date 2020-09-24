@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 
 class Sphere
 {
@@ -49,11 +50,17 @@ public:
 
     /**
      *  Adds a new vertex to the back of the vertices list.
+     *  @param map - The vertex pair map to be checked for existing index pairings.
      *  @param one - The start vertex of the mid-point to be calculated.
      *  @param two - The end vertex of the mid-point to be calculated.
      *  @return The index of the existing midpoint, or size() - 1 if a new vertex was added to the end.
      */
-    int MidPoint(int one, int two);
+    int MidPoint
+    (
+        std::map<std::pair<unsigned int, unsigned int>, unsigned int>* map, 
+        unsigned int one, 
+        unsigned int two
+    );
     
 private:
     // The list of unique vertices for the current shape.
@@ -64,4 +71,7 @@ private:
 
     // The spherical radius of this icosahedron.
     float radius;
+
+    // Counter for unique keys
+    unsigned int counter;
 };

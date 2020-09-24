@@ -125,7 +125,7 @@ int main()
         Gfx->EndFrame();
 
         // Processes any pending events in the queue
-        glfwPollEvents();    
+        glfwPollEvents();
     }
 
     // Clean up all drawing resources before exiting the program

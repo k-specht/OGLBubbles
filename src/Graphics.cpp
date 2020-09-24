@@ -244,7 +244,7 @@ void Graphics::GenerateSphere(int index)
     std::vector <unsigned int> indices = sphere->GetIndices();
     
     // Divide the icosahedron into a more spherical object
-    //sphere->Divide();
+    sphere->Divide();
 
     unsigned int oldSize = vertices.size();
     unsigned int oldSize2 = indices.size();
@@ -293,10 +293,10 @@ void Graphics::DrawSphere(int index)
     //glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
     
-    //glDrawArrays(GL_TRIANGLES, 0, 12);
+    //glDrawArrays(GL_TRIANGLES, 0, 126);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[index]);
-    glDrawElements(GL_TRIANGLES, 420, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sphere->GetIndices().size(), GL_UNSIGNED_INT, 0);
 }
 
 void Graphics::DrawCube(int index)
