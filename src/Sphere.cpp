@@ -60,16 +60,16 @@ Sphere::Sphere(float r)
 
     for (int i = 0; i <= vertices.size(); i++)
     {
-        float scale = std::sqrtf
+        float scale = radius / std::sqrtf
         (
             vertices[i][0] * vertices[i][0] +
             vertices[i][1] * vertices[i][1] +
             vertices[i][2] * vertices[i][2]
         );
 
-        vertices[i][0] /= (radius * scale);
-        vertices[i][1] /= (radius * scale);
-        vertices[i][2] /= (radius * scale);
+        vertices[i][0] *= scale;
+        vertices[i][1] *= scale;
+        vertices[i][2] *= scale;
     }
 
     // Generates default indices
@@ -105,7 +105,7 @@ Sphere::Sphere(float r)
         {9u, 8u, 1u}
     };
 
-    counter = 0;
+    counter = 11;
 }
 std::vector<unsigned int> Sphere::GetIndices()
 {
@@ -140,38 +140,111 @@ std::vector<float> Sphere::GetVertices()
 void Sphere::Divide()
 {
     // Creates a new indices set (instead of keeping the old, larger lines)
-    std::vector<std::array<unsigned int,3>> newInds = {  };
-    newInds.resize(indices.size());// * 3);
+    std::vector<std::array<unsigned int,3>> oldInds = indices;
+    std::vector<std::array<float,3>> oldVerts = vertices;
+    indices.clear();
+    vertices.clear();
+    indices.resize(0);
+    vertices.resize(0);
 
     // A map of vertex pairs with a unique id; allows better comparison than float == float
     Map* map = new Map();
-
-    unsigned int triad[] = {0, 0, 0};
+    std::array<unsigned int,3> oldTriad = {0u, 0u, 0u};
+    std::array<unsigned int,3> triad = {0u, 0u, 0u};
+    std::vector<std::array<float,3>> triangle;
+    //unsigned int index = 0u;
 
     // Loop through each index triad/triangle
-    for (auto tri : indices)
+    for (auto tri : oldInds)
     {
-        // Gets the index of the midpoint of each triangle edge
+        // Adds the old vertices/indices to the new list (for indexing purposes)
+        for (int i = 0; i < 3; i++)
+        {
+            oldTriad[i] = AddVertex(oldVerts[tri[i]]).first;
+        }
+
+        // Do I really want this old triangle? hm...
+        //indices.push_back(oldTriad);
+
+        // Gets the midpoint of each triangle edge
         //        o
         //      o   o
         //     o  o  o
-        triad[0] = MidPoint(map, tri[0], tri[1]);
-        triad[1] = MidPoint(map, tri[1], tri[2]);
-        triad[2] = MidPoint(map, tri[2], tri[0]);
+        triangle.clear();
+        triangle.push_back(MidPoint(map, oldTriad[0], oldTriad[1])); // Vertex 1
+        triangle.push_back(MidPoint(map, oldTriad[1], oldTriad[2])); // Vertex 2
+        triangle.push_back(MidPoint(map, oldTriad[2], oldTriad[0])); // Vertex 3
 
+        // We're done with the old triangle indices, so we set index to point to the first new one
+        //index += 3u;
+
+        // Adds the new vertices to the new list
+        for (int j = 0; j < 3; j++)
+        {
+            triad[j] = AddVertex(triangle[j]).first;
+        }
+        
         // Pushes the four new triangles to the end of the new indices list
-        newInds.push_back({ tri[0],   triad[0], triad[2] });
-        newInds.push_back({ tri[1],   triad[1], triad[0] });
-        newInds.push_back({ tri[2],   triad[2], triad[1] });
-        newInds.push_back({ triad[0], triad[1], triad[2] });
+        indices.push_back(triad);
+        //index += 3u;
     }
 
     // Might want to check that this does the right thing...
-    indices = newInds;
+    //indices = newInds;
+    //vertices = newVerts;
 }
 
-unsigned int Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
+std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex)
 {
+    bool hasV = false;
+    unsigned int vInd = 0u;
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        if (vertices[i] == vertex)
+        {
+            hasV = true;
+            vInd = static_cast<unsigned int>(i);
+            break;
+        }
+    }
+
+    if ( !hasV )
+    {
+        vInd = vertices.size();
+        vertices.push_back(vertex);
+    }
+
+    return std::make_pair(vInd, hasV);
+}
+
+std::array<float,3> Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
+{
+    std::array<float,3> newVertex = {0.0f, 0.0f, 0.0f};
+
+        // Calculate the new vertex's 3D position
+        for (int i = 0; i < 3; i++)
+            newVertex[i] = (vertices[x][i] + vertices[y][i]) / 2.0f;
+
+        // Scale the new vertices to the unit circle (normalization)
+        float scale = radius / std::sqrtf
+            (
+                newVertex[0] * newVertex[0] + 
+                newVertex[1] * newVertex[1] + 
+                newVertex[2] * newVertex[2] 
+            );
+        
+        for (int i = 0; i < 3; i++)
+            newVertex[i] *= scale;
+
+        // Returns the new vertex
+        return newVertex;
+
+
+
+
+
+    /*
     // NOTE: indices[x] doesn't follow this pattern:
     // 0    1    2    3    4    5    6    7    8
     // 0              1              2
@@ -189,8 +262,9 @@ unsigned int Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
     }
 
     // Check if vertex pair was inserted, if so create a new one since it's new
-    std::pair<Map::iterator, bool> inserted = map->insert({key, counter});
+    std::pair<Map::iterator, bool> inserted = map->insert({key, vertices.size()});
 
+    // Checks the boolean value ^
     if ( inserted.second )
     {
         std::array<float,3> newVertex = {0.0f, 0.0f, 0.0f};
@@ -200,7 +274,7 @@ unsigned int Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
             newVertex[i] = (vertices[x][i] + vertices[y][i]) / 2.0f;
 
         // Scale the new vertices to the unit circle (normalization)
-        float scale = std::sqrtf
+        float scale = radius / std::sqrtf
             (
                 newVertex[0] * newVertex[0] + 
                 newVertex[1] * newVertex[1] + 
@@ -208,7 +282,7 @@ unsigned int Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
             );
         
         for (int i = 0; i < 3; i++)
-            newVertex[i] /= (radius * scale);
+            newVertex[i] *= scale;
 
         // Add the new vertex to the vertices list
         vertices.push_back(newVertex);
@@ -216,7 +290,7 @@ unsigned int Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
     }
 
     // Returns the iterator's map id of the (maybe new) vertex
-    return inserted.first->second;
+    return inserted.first->second;*/
 }
 
 float Sphere::GetRadius()

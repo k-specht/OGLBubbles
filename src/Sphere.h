@@ -50,13 +50,20 @@ public:
     void Divide();
 
     /**
+     *  Adds the provided vertex to the list or returns its id.
+     *  @param vertex - The vertex to be added to the end of the list.
+     *  @return A pairing of the existing vertex's index and false, or 0u and true if it is added.
+     */
+    std::pair<unsigned int,bool> AddVertex(std::array<float,3> vertex);
+
+    /**
      *  Adds a new vertex to the back of the vertices list.
      *  @param map - The vertex pair map to be checked for existing index pairings.
      *  @param one - The start vertex of the mid-point to be calculated.
      *  @param two - The end vertex of the mid-point to be calculated.
      *  @return The index of the existing midpoint, or size() - 1 if a new vertex was added to the end.
      */
-    unsigned int MidPoint
+    std::array<float,3> MidPoint
     (
         std::map<std::pair<unsigned int, unsigned int>, unsigned int>* map, 
         unsigned int one, 

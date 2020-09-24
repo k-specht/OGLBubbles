@@ -79,7 +79,7 @@ int main()
 
     // Creates the window's graphics object
     Gfx = new Graphics(window);
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     
     // Loads reusable graphics
     try
