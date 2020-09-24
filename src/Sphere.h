@@ -45,9 +45,15 @@ public:
     float GetRadius();
 
     /**
+     *  Subdivides the icosahedron the given amount of times.
+     *  @param iterations - The number of times you wish to divide this shape.
+     */
+    void Divide(int iterations);
+
+    /**
      *  Divides the current icosahedron into more triangles.
      */
-    void Divide();
+    void Subdivision();
 
     /**
      *  Adds the provided vertex to the list or returns its id.

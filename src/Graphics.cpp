@@ -28,7 +28,7 @@ Graphics::Graphics(GLFWwindow* wnd)
     shaders.resize(maxSize);
     VAOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
-    sphere = new Sphere(1.0f);
+    sphere = new Sphere(3.0f);
 };
 
 void Graphics::ClearBuffer(float red, float green, float blue, float alpha)
@@ -244,7 +244,7 @@ void Graphics::GenerateSphere(int index)
     std::vector <unsigned int> indices = sphere->GetIndices();
     
     // Divide the icosahedron into a more spherical object
-    sphere->Divide();
+    sphere->Divide(2);
 
     unsigned int oldSize = vertices.size();
     unsigned int oldSize2 = indices.size();

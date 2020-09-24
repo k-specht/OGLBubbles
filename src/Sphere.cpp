@@ -62,9 +62,9 @@ Sphere::Sphere(float r)
     {
         float scale = radius / std::sqrtf
         (
-            vertices[i][0] * vertices[i][0] +
-            vertices[i][1] * vertices[i][1] +
-            vertices[i][2] * vertices[i][2]
+            (vertices[i][0] * vertices[i][0]) +
+            (vertices[i][1] * vertices[i][1]) +
+            (vertices[i][2] * vertices[i][2])
         );
 
         vertices[i][0] *= scale;
@@ -137,7 +137,16 @@ std::vector<float> Sphere::GetVertices()
     return vertOutput;
 }
 
-void Sphere::Divide()
+
+void Sphere::Divide(int divisions)
+{
+    for (int i = 0; i < divisions; i++)
+    {
+        Subdivision();
+    }
+}
+
+void Sphere::Subdivision()
 {
     // Creates a new indices set (instead of keeping the old, larger lines)
     std::vector<std::array<unsigned int,3>> oldInds = indices;
@@ -151,6 +160,7 @@ void Sphere::Divide()
     Map* map = new Map();
     std::array<unsigned int,3> oldTriad = {0u, 0u, 0u};
     std::array<unsigned int,3> triad = {0u, 0u, 0u};
+    std::array<unsigned int,3> tempTriad = {0u, 0u, 0u};
     std::vector<std::array<float,3>> triangle;
     //unsigned int index = 0u;
 
@@ -185,7 +195,17 @@ void Sphere::Divide()
         }
         
         // Pushes the four new triangles to the end of the new indices list
-        indices.push_back(triad);
+        tempTriad = { oldTriad[0], triad[0], triad[2] };
+        indices.push_back(tempTriad);
+
+        tempTriad = { oldTriad[1], triad[1], triad[0] };
+        indices.push_back(tempTriad);
+
+        tempTriad = { oldTriad[2], triad[2], triad[1] };
+        indices.push_back(tempTriad);
+
+        tempTriad = { triad[0], triad[1], triad[2] };
+        indices.push_back(tempTriad);
         //index += 3u;
     }
 
@@ -229,9 +249,9 @@ std::array<float,3> Sphere::MidPoint(Map* map, unsigned int x, unsigned int y)
         // Scale the new vertices to the unit circle (normalization)
         float scale = radius / std::sqrtf
             (
-                newVertex[0] * newVertex[0] + 
-                newVertex[1] * newVertex[1] + 
-                newVertex[2] * newVertex[2] 
+                (newVertex[0] * newVertex[0]) + 
+                (newVertex[1] * newVertex[1]) + 
+                (newVertex[2] * newVertex[2]) 
             );
         
         for (int i = 0; i < 3; i++)
