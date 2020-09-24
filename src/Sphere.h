@@ -1,5 +1,6 @@
 #include <vector>
 #include <map>
+#include <array>
 
 class Sphere
 {
@@ -55,7 +56,7 @@ public:
      *  @param two - The end vertex of the mid-point to be calculated.
      *  @return The index of the existing midpoint, or size() - 1 if a new vertex was added to the end.
      */
-    int MidPoint
+    unsigned int MidPoint
     (
         std::map<std::pair<unsigned int, unsigned int>, unsigned int>* map, 
         unsigned int one, 
@@ -64,10 +65,10 @@ public:
     
 private:
     // The list of unique vertices for the current shape.
-    std::vector<float> vertices;
+    std::vector<std::array<float,3>> vertices;
 
     // A list of the triangle indices formed from this shape's vertices.
-    std::vector<unsigned int> indices;
+    std::vector<std::array<unsigned int,3>> indices;
 
     // The spherical radius of this icosahedron.
     float radius;
