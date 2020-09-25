@@ -8,6 +8,7 @@
 #include <GLFW/glfw3native.h>
 #include "OGLBubbles.h"
 #include "Graphics.h"
+#include "Camera.h"
 
 #include <iostream>
 
@@ -22,6 +23,7 @@
 
 // Global pointer to the graphics object
 Graphics* Gfx;
+Camera* Cam;
 
 /**
  *  Updates the viewport to the new size of the window's frame. Might need to move to Graphics at some point.
@@ -32,6 +34,17 @@ Graphics* Gfx;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+/**
+ *  Updates the viewport to the new size of the window's frame. Might need to move to Graphics at some point.
+ *  @param window - The window whose frame changed.
+ *  @param xPos   - The new x position of the mouse.
+ *  @param yPos   - The new y position of the mouse.
+ */
+void mouse_move_callback(GLFWwindow* window, double xPos, double yPos)
+{
+    Cam->ProcessMouse(xPos, yPos);
 }
 
 /**
@@ -73,12 +86,15 @@ int main()
     // Sets the default viewport size
     glViewport(0, 0, 800, 600);
     glEnable(GL_DEPTH_TEST);
+    Cam = new Camera(window);
 
     // When the frame size changes, this calls a function to update it
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_move_callback);
 
     // Creates the window's graphics object
-    Gfx = new Graphics(window);
+    Gfx = new Graphics(window, Cam);
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
     
     // Loads reusable graphics
@@ -86,8 +102,9 @@ int main()
     {
         Gfx->CreateShaders();
         //Gfx->GenerateTriangle(0);
-        //Gfx->GenerateCube(0);
+        
         Gfx->GenerateSphere(0);
+        Gfx->GenerateCube(1);
     }
     catch(const std::exception& e)
     {
@@ -99,7 +116,7 @@ int main()
     while(!glfwWindowShouldClose(window))
     {
         // Process any inputs
-        Gfx->ProcessInput();
+        Cam->ProcessInput();
 
         // Clears the buffer to the specified color (aka, background color)
         Gfx->ClearBuffer(1.0f, 1.0f, 1.0f, 1.0f);
@@ -112,8 +129,10 @@ int main()
             Gfx->Transform(800.0f, 600.0f);
 
             //Gfx->DrawTriangle(0);
-            //Gfx->DrawCube(0);
+            Gfx->DrawCube(1);
             Gfx->DrawSphere(0);
+
+            Cam->UpdateCamera();
         }
         catch(const std::exception& e)
         {

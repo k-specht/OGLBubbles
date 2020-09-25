@@ -7,6 +7,7 @@
 #include <map>
 
 using namespace std;
+using namespace glm;
 using Map = std::map<std::pair<unsigned int, unsigned int>, unsigned int>;
 
 Sphere::Sphere(float r)
@@ -17,6 +18,8 @@ Sphere::Sphere(float r)
 
     // Fix the radius so each side is of length sqrt(t^2 +1)
     radius /= sqrt( t*t + 1.0 );
+
+    
 
     // Creates the original icosahedron 
     // (see the wikipedia page of icosahedron for details on coordinates)

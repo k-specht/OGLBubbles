@@ -19,9 +19,10 @@
 
 using namespace std;
 
-Graphics::Graphics(GLFWwindow* wnd)
+Graphics::Graphics(GLFWwindow* wnd, Camera* cam)
 {
     Graphics::window = wnd;
+    Graphics::camera = cam;
 
     // Initializes shader array to the default max size
     maxSize = 6;
@@ -29,6 +30,12 @@ Graphics::Graphics(GLFWwindow* wnd)
     VAOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
     sphere = new Sphere(3.0f);
+
+    /*// Camera positions
+    cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+    view        = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);*/
 };
 
 void Graphics::ClearBuffer(float red, float green, float blue, float alpha)
@@ -42,12 +49,29 @@ void Graphics::EndFrame()
     glfwSwapBuffers(window);
 }
 
-void Graphics::ProcessInput()
+/*
+void Graphics::UpdateCamera()
+{
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+}*/
+
+/*void Graphics::ProcessInput()
 {
     // Add any additional inputs you want to be aware of in the following style
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-}
+
+    const float cameraSpeed = 0.05f; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+}*/
 
 void Graphics::CreateShaders()
 {
@@ -374,12 +398,12 @@ void Graphics::Transform(float width, float height)
     */
     // create transformations
     glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-    glm::mat4 view          = glm::mat4(1.0f);
+    //glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
 
     //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-    view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+    model = glm::rotate(model, 0.0f, glm::vec3(0.5f, 1.0f, 0.0f));//(float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    //view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
     projection = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
 
     // retrieve the matrix uniform locations
@@ -388,7 +412,7 @@ void Graphics::Transform(float width, float height)
 
     // pass them to the shaders (3 different ways)
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &camera->GetView()[0][0]);
     
     // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
     glUniformMatrix4fv(glGetUniformLocation(shaders.back()->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
@@ -399,6 +423,11 @@ void Graphics::SetMaxSize(int size)
     Graphics::maxSize = size;
     
     // TODO: Copy VAOs, EBOs and shader programs to new arrays of the updated size
+}
+
+void Graphics::Mouse(GLFWwindow* window, double xpos, double ypos)
+{
+
 }
 
 void Graphics::Close()

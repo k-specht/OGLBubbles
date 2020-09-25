@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "Shader.h"
 #include "Sphere.h"
+#include "Camera.h"
 
 #include <vector>
 
@@ -13,8 +14,9 @@ public:
      *  TODO: Organize this class's functions in a more meaningful manner.
      *  TODO: Implement the display lists in the tutorial for Chapter 7: https://www.opengl.org.ru/docs/pg/0208.html
      *  @param window - A pointer to the GLFW window you wish to attach Graphics to.
+     *  @param cam    - A pointer to the Camera associated with this Graphics object.
      */
-    Graphics(GLFWwindow* window);
+    Graphics(GLFWwindow* window, Camera* cam);
 
     /**
      *  A basic copy operation on the Graphics object.
@@ -134,6 +136,16 @@ public:
      *  Closes any remaining graphics resources attached to the active window.
      */
     void Close();
+
+    /**
+     *  Updates the camera position to whatever the resulting matrix is from processing inputs.
+     */
+    void UpdateCamera();
+
+    /**
+     *  A callback function for GLFW to manage mouse data.
+     */
+    void Mouse(GLFWwindow* window, double xpos, double ypos);
 private:
     // A pointer to the window this Graphics instance paints to
     GLFWwindow* window;
@@ -150,6 +162,15 @@ private:
     // Pointer to this Graphics object's Element Buffer Object array
     unsigned int* EBOs;
 
-    // Pointer to this Graphics object's sphere object (TODO: change this to generated shapes array)
+    // Pointer to this Graphics object's sphere object (TODO: remove this unneeded variable)
     Sphere* sphere;
+
+    // The camera associated with this Graphics object
+    Camera* camera;
+
+    /*// Camera position data
+    glm::vec3 cameraPos;
+    glm::vec3 cameraFront;
+    glm::vec3 cameraUp;
+    glm::mat4 view;*/
 };
