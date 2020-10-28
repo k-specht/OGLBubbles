@@ -35,14 +35,16 @@ public:
     /** Returns error number.
      *  @return #error_number
      */
-    virtual int getErrorNumber() const throw() {
+    virtual int getErrorNumber() const throw() 
+    {
         return error_number;
     }
     
     /**Returns error offset.
      * @return #error_offset
      */
-    virtual int getErrorOffset() const throw() {
+    virtual int getErrorOffset() const throw() 
+    {
         return error_offset;
     }
 

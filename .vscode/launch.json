@@ -14,7 +14,11 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "preLaunchTask": "C/C++: cl.exe build active file"
+            "preLaunchTask": "C/C++: cl.exe build active file",
+            "sourceFileMap": { // because VSC is really annoying-
+                "c:\\Users\\xpech\\AppData\\Local\\Programs\\Microsoft VS Code\\minkernel\\crts\\ucrt\\src\\appcrt\\lowio\\open.cpp": "C:\\Program Files (x86)\\Windows Kits\\10\\Source\\10.0.17763.0\\ucrt\\lowio\\open.cpp"
+             }
+            //"dumpPath": "bin\\memdump.dmp"
         }
     ]
 }

@@ -11,6 +11,7 @@
 #include <iostream>
 #include "Shader.h"
 #include <vector>
+#include "Centroid.h"
 
 // OpenGL Mathematics library
 #include <glm/glm.hpp>
@@ -19,17 +20,17 @@
 
 using namespace std;
 
-Graphics::Graphics(GLFWwindow* wnd, Camera* cam)
+Graphics::Graphics(GLFWwindow* wnd, Camera* cam, float radius)
 {
-    Graphics::window = wnd;
-    Graphics::camera = cam;
+    this->window = wnd;
+    this->camera = cam;
 
     // Initializes shader array to the default max size
     maxSize = 6;
     shaders.resize(maxSize);
     VAOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
-    sphere = new Sphere(3.0f);
+    sphere = new Sphere(radius);
 
     /*// Camera positions
     cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
@@ -37,6 +38,114 @@ Graphics::Graphics(GLFWwindow* wnd, Camera* cam)
     cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
     view        = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);*/
 };
+
+void Graphics::GenerateCluster(int index)
+{
+    // The number of points in this cluster
+    int n;
+
+    // Read in points
+    ifstream source;
+    try
+    {
+        source.open("../OGLBubbles/bin/input.txt", ios::in);
+    }
+    catch (std::ios_base::failure &ex)
+    {
+        std::cout << ex.what() << std::endl;
+    }
+
+    if ( source.fail() ) 
+    {
+        std::cout << "Cannot open file: " << source.eof() << std::endl;
+        return;
+    }
+    bool first = true;
+    std::vector<float> vertices = vector<float>();
+    
+    for (string line; getline(source, line);)
+    {
+        istringstream in(line);
+
+        if ( first )
+        {
+            in >> n;
+            first = false;
+            continue;
+        }
+
+        float p1, p2, p3;
+        in >> p1;
+        in >> p2;
+        in >> p3;
+        
+        vertices.push_back(p1);
+        vertices.push_back(p2);
+        vertices.push_back(p3);
+    }
+    source.close();
+
+    // Graphics Pipeline
+    // Step 1: Create the data for the object and generate buffers
+
+    // Generates and binds a vertex buffer, then copies data to it
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    // Adds all the defined data into a vertex array object (note that you can make an array of these)
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    VAOs[index] = VAO;
+
+    // Step 2. Copy the data into buffers and bind them to the current VAO
+    glBindVertexArray(VAOs[index]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices.front()), static_cast<void*>(vertices.data()), GL_STATIC_DRAW);
+
+    // Step 3. Set the vertex attribute pointers and enable them
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //std::cout << "Generation completed with size " << vertices.size() << ", expected: " << n * 3 << "." << std::endl;
+}
+
+void Graphics::DrawCluster(int index, int n)
+{
+    // Renders the cluster
+    glUseProgram(shaders.back()->ID);
+    glBindVertexArray(VAOs[index]);
+    
+    glDrawArrays(GL_LINE_LOOP, 0, n);
+}
+
+/*void Graphics::GenerateCentroid(int index, float center[3], float radius)
+{
+    // Graphics Pipeline
+    // Step 1: Create the data for the object and generate buffers
+
+    // Generates and binds a vertex buffer, then copies data to it
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    // Adds all the defined data into a vertex array object (note that you can make an array of these)
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    VAOs[index] = VAO;
+
+    // Step 2. Copy the data into buffers and bind them to the current VAO
+    glBindVertexArray(VAOs[index]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices.front()), static_cast<void*>(vertices.data()), GL_STATIC_DRAW);
+
+    // Step 3. Set the vertex attribute pointers and enable them
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+}
+
+void Graphics::DrawCentroid(int index, float center[3], float radius)
+{
+
+}*/
 
 void Graphics::ClearBuffer(float red, float green, float blue, float alpha)
 {
@@ -89,10 +198,10 @@ void Graphics::GenerateRectangle(int index)
     // Step 1. Create the object data and generate buffers
     float vertices[] = 
     {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
     };
     unsigned int indices[] = 
     {
@@ -186,16 +295,16 @@ void Graphics::GenerateCube(int index)
     float vertices[] = 
     {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
 
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
 
@@ -206,24 +315,24 @@ void Graphics::GenerateCube(int index)
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
 
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
 
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
 
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f
     };
@@ -264,19 +373,20 @@ void Graphics::GenerateCube(int index)
 void Graphics::GenerateSphere(int index)
 {
     // Get icosahedron data from the sphere object
-    std::vector <float> vertices = sphere->GetVertices();
-    std::vector <unsigned int> indices = sphere->GetIndices();
+    std::vector <float>        vertices = sphere->GetVertices();
+    std::vector <unsigned int> indices  = sphere->GetIndices();
+    
     
     // Divide the icosahedron into a more spherical object
-    sphere->Divide(2);
+    sphere->Divide(1);
 
-    unsigned int oldSize = vertices.size();
+    unsigned int oldSize  = vertices.size();
     unsigned int oldSize2 = indices.size();
     vertices = sphere->GetVertices();
-    indices = sphere->GetIndices();
+    indices  = sphere->GetIndices();
 
-    std::cout << "New vertices size (was " << oldSize << "): " << vertices.size() << std::endl;
-    std::cout << "New indices size (was " << oldSize2 << "): " << indices.size() << std::endl;
+    std::cout << "New vertices size (was " << oldSize  / 3 << "): " << vertices.size() / 3 << std::endl;
+    std::cout << "New indices size (was "  << oldSize2 / 3 << "): " << indices.size()  / 3 << std::endl;
 
     // Following is the typical OpenGL generation
     unsigned int VBO;
@@ -350,8 +460,8 @@ void Graphics::DrawTriangle(int index)
 
     // Send color data to the pixel shader c:
     // Note that if you want to keep this idea, change sin to dot product
-    float time = glfwGetTime();
-    float colorValue = (sin(time)/2.0f) + 0.5f;
+    float time              = glfwGetTime();
+    float colorValue        = (sin(time)/2.0f) + 0.5f;
     int vertexColorLocation = glGetUniformLocation(shaders.back()->ID, "timeColor");
 
     // The final part of the process, this should be done in the render loop
@@ -401,18 +511,18 @@ void Graphics::Transform(float width, float height)
     //glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
 
-    //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, 0.0f, glm::vec3(0.5f, 1.0f, 0.0f));//(float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    model      = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));//(float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     //view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
     projection = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
 
     // retrieve the matrix uniform locations
     unsigned int modelLoc = glGetUniformLocation(shaders.back()->ID, "model");
-    unsigned int viewLoc  = glGetUniformLocation(shaders.back()->ID, "view");
+    unsigned int viewLoc  = glGetUniformLocation(shaders.back()->ID, "view" );
 
     // pass them to the shaders (3 different ways)
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &camera->GetView()[0][0]);
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)   );
+    glUniformMatrix4fv(viewLoc,  1, GL_FALSE, &camera->GetView()[0][0]);
     
     // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
     glUniformMatrix4fv(glGetUniformLocation(shaders.back()->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
@@ -420,7 +530,7 @@ void Graphics::Transform(float width, float height)
 
 void Graphics::SetMaxSize(int size)
 {
-    Graphics::maxSize = size;
+    this->maxSize = size;
     
     // TODO: Copy VAOs, EBOs and shader programs to new arrays of the updated size
 }
@@ -433,4 +543,11 @@ void Graphics::Mouse(GLFWwindow* window, double xpos, double ypos)
 void Graphics::Close()
 {
     glfwTerminate();
+    if (sphere != NULL)
+        delete sphere;
+    for (auto shader : shaders) if (shader != NULL) delete shader;
+    delete VAOs;   // Handled by glfwTerminate?
+    delete EBOs;   // Handled by glfwTerminate?
+    //delete camera; // handled by OGLBubbles
+    //delete window; // handled by glfwTerminate
 }

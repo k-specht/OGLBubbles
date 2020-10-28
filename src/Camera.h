@@ -20,14 +20,14 @@ class Camera
             cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
             view        = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
-            float yaw = 0.0f;
-            float pitch = 0.0f;
-            float lastPosX = 0.0f;
-            float lastPosY = 0.0f;
+            //float yaw      = 0.0f;
+            //float pitch    = 0.0f;
+            //float lastPosX = 0.0f;
+            //float lastPosY = 0.0f;
         }
         Camera(const Camera&) = delete;
         Camera& operator=(const Camera&) = delete;
-        ~Camera();
+        ~Camera() { }; // Deconstructor
 
         /**
          *  Processes the movement of the mouse.
@@ -43,28 +43,29 @@ class Camera
                 firstMouse = false;
             }*/
 
-            float xOff = xPos - lastPosX;
-            float yOff = lastPosY - yPos; // reversed since y-coordinates go from bottom to top
+            float xOff = xPos     - lastPosX;
+            float yOff = lastPosY - yPos;    // reversed since y-coordinates go from bottom to top
 
             lastPosX = xPos;
             lastPosY = yPos;
 
-            float sensitivity = 0.1f;
+            float sensitivity = 0.1f; // TODO: Create Camera default sensitivity
             xOff *= sensitivity;
             yOff *= sensitivity;
 
             yaw   += xOff;
             pitch += yOff;
 
+            // Avoids unexpected behavior around edges of camera movement
             if(pitch > 89.0f)
                 pitch = 89.0f;
             if(pitch < -89.0f)
                 pitch = -89.0f;
 
             glm::vec3 direction;
-            direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+            direction.x = cos(glm::radians(yaw) ) * cos(glm::radians(pitch));
             direction.y = sin(glm::radians(pitch));
-            direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+            direction.z = sin(glm::radians(yaw) ) * cos(glm::radians(pitch));
             cameraFront = glm::normalize(direction);
         }
 
@@ -74,7 +75,7 @@ class Camera
             if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, true);
 
-            const float cameraSpeed = 0.05f; // adjust accordingly
+            const float cameraSpeed = 0.05f; // TODO: Add default camera speed values
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
                 cameraPos += cameraSpeed * cameraFront;
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

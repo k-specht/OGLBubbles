@@ -9,8 +9,8 @@
 Shader::Shader(const char* vertexPath, const char* pixelPath)
 {
     // Retrieves the vertex/fragment source code from filePath
-    std::string vertexCode;
-    std::string pixelCode;
+    std::string   vertexCode;
+    std::string   pixelCode;
     std::ifstream vShaderFile;
     std::ifstream pShaderFile;
 
@@ -35,7 +35,7 @@ Shader::Shader(const char* vertexPath, const char* pixelPath)
 
         // Converts streams into strings
         vertexCode   = vShaderStream.str();
-        pixelCode = pShaderStream.str();		
+        pixelCode    = pShaderStream.str();		
     }
     catch(std::ifstream::failure e)
     {
@@ -98,12 +98,14 @@ Shader::Shader(const char* vertexPath, const char* pixelPath)
     }
 
     // Removes unneeded data and sets the Shader object's id
-    Shader::use();
+    this->use();
     glDeleteShader(vertexShader);
     glDeleteShader(pixelShader);
+    //delete vShaderCode;
+    //delete pShaderCode;
 }
 
 void Shader::use()
 {
-    glUseProgram(Shader::ID);
+    glUseProgram(this->ID);
 }

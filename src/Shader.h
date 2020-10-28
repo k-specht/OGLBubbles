@@ -21,6 +21,8 @@ public:
      *  @param pixelShaderPath  - The path and filename of the pixel shader you want to load.
      */
     Shader(const char* vertexShaderPath, const char* pixelShaderPath);
+
+    ~Shader()  { }; // Deconstructor
     
     /**
      *  Activates this shader program.

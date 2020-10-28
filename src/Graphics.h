@@ -16,24 +16,24 @@ public:
      *  @param window - A pointer to the GLFW window you wish to attach Graphics to.
      *  @param cam    - A pointer to the Camera associated with this Graphics object.
      */
-    Graphics(GLFWwindow* window, Camera* cam);
+    Graphics(GLFWwindow* window, Camera* cam, float radius);
 
     /**
      *  A basic copy operation on the Graphics object.
-     *  Copying an object doesn't make sense, so we just delete it.
+     *  Copying an object doesn't make sense, so we just delete the function.
      */
     Graphics(const Graphics&) = delete;
 
     /**
      *  A basic move operation on the Graphics object.
-     *  Moving an object doesn't make much sense, so we just delete it.
+     *  Moving an object doesn't make much sense, so we just delete the function.
      */
     Graphics& operator=(const Graphics&) = delete;
 
     /**
      *  Deconstructor for the Graphics object.
      */
-    ~Graphics();
+    ~Graphics() { };
 
     /**
      *  Presents the current frame in the draw buffer by swapping the two buffers.
@@ -47,7 +47,8 @@ public:
      *  @param blue  - The blue channel of this color.
      *  @param alpha - The alpha channel of this color.
      */
-    void ClearBuffer(
+    void ClearBuffer
+    (
         float red,
         float blue,
         float green,
@@ -66,10 +67,11 @@ public:
 
     /**
      *  Creates matrix transformations.
-     *  @param width - The screen width.
+     *  @param width  - The screen width.
      *  @param height - The screen height.
      */
-    void Transform(
+    void Transform
+    (
         float width,
         float height
     );
@@ -99,6 +101,29 @@ public:
     void GenerateSphere(int index);
 
     /**
+     *  Generates bindables for a cluster of points using input.txt.
+     *  @param index - The index of the VAO for this drawable object.
+     */
+    void GenerateCluster(int index);
+
+    /**
+     *  Generates bindables for a Centroid.
+     *  @param index  - The index of the VAO for this drawable object.
+     *  @param center - The xyz coordinates of the center of this circle.
+     *  @param radius - The radius for this circle.
+     */
+    //void GenerateCentroid(int index, float center[3]), float radius;
+
+
+    /**
+     *  Draws a Centroid.
+     *  @param index  - The index of the VAO for this drawable object.
+     *  @param center - The xyz coordinates of the center of this circle.
+     *  @param radius - The radius for this circle.
+     */
+    //void DrawCentroid(int index, float center[3], float radius);
+
+    /**
      *  Draws a sphere to the screen using the graphics pipeline.
      *  @param index - The index of the VAO for this drawable object.
      */
@@ -122,6 +147,14 @@ public:
      */
     void DrawRectangle(int index);
 
+
+    /**
+     *  Uses the Centroid mini-project to draw a cluster and containing sphere.
+     *  @param index - The index of the VAO for this drawable object.
+     *  @param n     - The number of vertices to draw.
+     */
+    void DrawCluster(int index, int n);
+
     /**
      *  Processes any inputs given to the window this Graphics instance is attached to.
      */
@@ -129,6 +162,7 @@ public:
 
     /**
      *  Sets the maximum shader capacity.
+     *  @param size - The new maximum shader capacity for this Graphics instance.
      */
     void SetMaxSize(int size);
 
@@ -144,8 +178,16 @@ public:
 
     /**
      *  A callback function for GLFW to manage mouse data.
+     *  @param window - The GLFW window whose mouse data is being handled.
+     *  @param xpos   - The x position of the mouse.
+     *  @param ypos   - The y position of the mouse.
      */
-    void Mouse(GLFWwindow* window, double xpos, double ypos);
+    void Mouse
+    (
+        GLFWwindow* window, 
+        double xpos, 
+        double ypos
+    );
 private:
     // A pointer to the window this Graphics instance paints to
     GLFWwindow* window;
