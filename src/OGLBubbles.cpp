@@ -20,7 +20,7 @@
  *  TODO Rearrange this messy, messy file.
  *  Note: If you want to work with textures, add the SAIL library: https://github.com/smoked-herring/sail
  *  @author Käthe Specht
- *  @version 1.0 09/14/2020
+ *  @version 1.0 - 09/14/2020
  */
 
 // Global pointer to the graphics object
@@ -56,68 +56,77 @@ void mouse_move_callback(GLFWwindow* window, double xPos, double yPos)
  */
 int main()
 {
-    // Initialize window
-    if(glfwInit() == GLFW_FALSE)
+    // Initialize window & graphics
+    GLFWwindow* window;
+    try
     {
-        std::cout << "GLFW Initialization failed! Check include paths and library/dll locations." << std::endl;
+        if(glfwInit() == GLFW_FALSE)
+        {
+            std::cout << "GLFW Initialization failed! Check include paths and library/dll locations." << std::endl;
+            return -1;
+        }
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.2);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        #ifdef __APPLE__
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        #endif
+
+        // Create the window and sets it as the current context
+        window = glfwCreateWindow(800, 600, "OGLBubbles", NULL, NULL);
+        if (window == NULL)
+        {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+        glfwMakeContextCurrent(window);
+
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cerr << "Failed to initialize GLAD" << std::endl;
+            return -1;
+        }
+
+        // Sets the default viewport size
+        glViewport(0, 0, 800, 600);
+        glEnable(GL_DEPTH_TEST);
+        Cam = new Camera(window);
+        if (Cam == NULL)
+        {
+            std::cerr << "Failed to create camera object" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+
+        // When the frame size changes, this calls a function to update it
+        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Capture: GLFW_CUROR_DISABLED
+        glfwSetCursorPosCallback(window, mouse_move_callback);
+
+        // Creates the window's graphics object
+        /*std::array<float,3> centerPoint;
+        float radius;
+        auto pair   = Center();
+        centerPoint = pair.first;
+        radius      = pair.second;
+        radius *= 2.0f;
+        Gfx = new Graphics(window, Cam, radius);*/
+        Gfx = new Graphics(window, Cam, 1.0f);
+        if (Gfx == NULL)
+        {
+            std::cerr << "Failed to create graphics object" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // Comment out for normal drawing
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
         return -1;
     }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
 
-    // Create the window and sets it as the current context
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OGLBubbles", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
-    // Sets the default viewport size
-    glViewport(0, 0, 800, 600);
-    glEnable(GL_DEPTH_TEST);
-    Cam = new Camera(window);
-    if (Cam == NULL)
-    {
-        std::cout << "Failed to create camera object" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    // When the frame size changes, this calls a function to update it
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(window, mouse_move_callback);
-
-    // Creates the window's graphics object
-    /*std::array<float,3> centerPoint;
-    float radius;
-    auto pair   = Center();
-    centerPoint = pair.first;
-    radius      = pair.second;
-    radius *= 2.0f;
-    Gfx = new Graphics(window, Cam, radius);*/
-    Gfx = new Graphics(window, Cam, 1.0f);
-    if (Gfx == NULL)
-    {
-        std::cout << "Failed to create graphics object" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // Comment out for normal drawing
-    
     // Loads reusable graphics
     try
     {
@@ -173,9 +182,17 @@ int main()
     }
 
     // Clean up all drawing resources before exiting the program
-    Gfx->Close();
-    delete Gfx;
-    delete Cam;
+    try 
+    {
+        delete Gfx;
+        delete Cam;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return -1;
+    }
+    
     //delete window;
     return 0;
 }

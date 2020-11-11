@@ -33,7 +33,10 @@ public:
     /**
      *  Deconstructor for the Graphics object.
      */
-    ~Graphics() { };
+    ~Graphics() 
+    { 
+        Close();
+    };
 
     /**
      *  Presents the current frame in the draw buffer by swapping the two buffers.

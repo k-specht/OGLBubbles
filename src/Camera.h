@@ -20,10 +20,10 @@ class Camera
             cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
             view        = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
-            //float yaw      = 0.0f;
-            //float pitch    = 0.0f;
-            //float lastPosX = 0.0f;
-            //float lastPosY = 0.0f;
+            yaw      = 0.0f;
+            pitch    = 0.0f;
+            lastPosX = 0.0f;
+            lastPosY = 0.0f;
         }
         Camera(const Camera&) = delete;
         Camera& operator=(const Camera&) = delete;
@@ -31,6 +31,7 @@ class Camera
 
         /**
          *  Processes the movement of the mouse.
+         *  TODO: Change mouse to non-captured, do something else with mouse data.
          *  @param xPos - The new x position of the mouse.
          *  @param yPos - The new y position of the mouse.
          */
@@ -43,7 +44,7 @@ class Camera
                 firstMouse = false;
             }*/
 
-            float xOff = xPos     - lastPosX;
+            /*float xOff = xPos     - lastPosX;
             float yOff = lastPosY - yPos;    // reversed since y-coordinates go from bottom to top
 
             lastPosX = xPos;
@@ -66,7 +67,7 @@ class Camera
             direction.x = cos(glm::radians(yaw) ) * cos(glm::radians(pitch));
             direction.y = sin(glm::radians(pitch));
             direction.z = sin(glm::radians(yaw) ) * cos(glm::radians(pitch));
-            cameraFront = glm::normalize(direction);
+            //cameraFront = glm::normalize(direction);*/
         }
 
         void ProcessInput()
@@ -75,7 +76,9 @@ class Camera
             if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, true);
 
+            // Camera xyz movement
             const float cameraSpeed = 0.05f; // TODO: Add default camera speed values
+            const float viewSpeed   = 0.8f;
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
                 cameraPos += cameraSpeed * cameraFront;
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -85,6 +88,28 @@ class Camera
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
                 cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
+            // Camera rotational movement
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+                yaw   -= viewSpeed;
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+                yaw   += viewSpeed;
+            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+                pitch += viewSpeed;
+            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+                pitch -= viewSpeed;
+
+            // Camera rotational fix for edge behavior
+            if(pitch > 89.0f)
+                pitch = 89.0f;
+            if(pitch < -89.0f)
+                pitch = -89.0f;
+
+            // Updates viewport based on changes in pitch/yaw
+            glm::vec3 direction;
+            direction.x = cos(glm::radians(yaw) ) * cos(glm::radians(pitch));
+            direction.y = sin(glm::radians(pitch));
+            direction.z = sin(glm::radians(yaw) ) * cos(glm::radians(pitch));
+            cameraFront = glm::normalize(direction);
         }
 
         /**
