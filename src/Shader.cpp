@@ -1,10 +1,19 @@
-#include "Shader.h"
-#include "BubbleError.h"
+#include "Shader.hpp"
+
+#include <glad/glad.h>
+  
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+//#include "OGLBLOG.hpp" // Linker doesn't like this :<
+
 /**
  *  Shader.cpp
+ *  TODO: Refactor error handling.
  *  The file reading method was partially adapted from the LearnOpenGL's Shader tutorial.
  */
-
 
 Shader::Shader(const char* vertexPath, const char* pixelPath)
 {
@@ -39,12 +48,13 @@ Shader::Shader(const char* vertexPath, const char* pixelPath)
     }
     catch(std::ifstream::failure e)
     {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-        throw BubbleError(e.what(),0,0);
+        //Log::e(e.what()); // Linker hates this for some reason??
+        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        return;
     }
+
     const char* vShaderCode = vertexCode.c_str();
     const char* pShaderCode = pixelCode.c_str();
-
 
     // Shader generation (vertex)
     unsigned int vertexShader;
@@ -53,16 +63,16 @@ Shader::Shader(const char* vertexPath, const char* pixelPath)
     glShaderSource(vertexShader, 1, &vShaderCode, NULL);
     glCompileShader(vertexShader);
 
-
     int  success;
     char infoLog[512];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 
-    if(!success)
+    if ( !success )
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED" << std::endl;
-        throw BubbleError(infoLog, 512, 0);
+        //Log::e(infoLog); // Linker hates this for some reason??
+        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED" << std::endl;
+        return;
     }
 
     // Shader generation (pixel)
@@ -74,11 +84,12 @@ Shader::Shader(const char* vertexPath, const char* pixelPath)
 
     glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &success);
 
-    if(!success)
+    if ( !success )
     {
         glGetShaderInfoLog(pixelShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PIXEL::COMPILATION_FAILED" << std::endl;
-        throw BubbleError(infoLog, 512, 0);
+        //Log::e(infoLog); // Linker hates this for some reason??
+        std::cerr << "ERROR::SHADER::PIXEL::COMPILATION_FAILED" << std::endl;
+        return;
     }
 
     // Creates shader program from the two compiled shaders
@@ -90,11 +101,12 @@ Shader::Shader(const char* vertexPath, const char* pixelPath)
 
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
 
-    if(!success) 
+    if ( !success ) 
     {
         glGetProgramInfoLog(ID, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED" << std::endl;
-        throw BubbleError(infoLog, 512, 0);
+        //Log::e(infoLog); // Linker hates this for some reason??
+        std::cerr << "ERROR::SHADER::PROGRAM::LINK_FAILED" << std::endl;
+        return;
     }
 
     // Removes unneeded data and sets the Shader object's id

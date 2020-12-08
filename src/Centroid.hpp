@@ -1,8 +1,11 @@
-#ifndef Centroid
-#define Centroid
+#ifndef CENTROID
+#define CENTROID
 
 #include <vector>
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
 #include <array>
 
 /** A structure of x y z coordinates for a singular point. */
@@ -21,8 +24,8 @@ struct Point
  */
 inline float distance(Point one, Point two)
 {
-    return sqrt(pow(one.x - two.x, 2) + pow(one.y - two.y, 2) + pow(one.z - two.z, 2));
-}
+    return std::sqrt(std::pow(one.x - two.x, 2) + std::pow(one.y - two.y, 2) + std::pow(one.z - two.z, 2));
+};
 
 /** 
  *  Subtracts vector 2 from vector 1.
@@ -39,7 +42,7 @@ inline Point vSub(Point v1, Point v2)
     p.z = v1.z - v2.z;
 
     return p;
-}
+};
 
 /**
  *  Finds the furthest point and returns it.
@@ -68,12 +71,12 @@ inline Point findGreatest(Point center, Point points[], int n)
     }
 
     // Debug code that's probably equivalent to "if (points.length <= 1)"
-    if ( (maxPt.x == center.x) && (maxPt.y == center.y) && (maxPt.z == center.z))
-        std::cout << "ERR: greatest distance is center point?" << std::endl;
+    //if ( (maxPt.x == center.x) && (maxPt.y == center.y) && (maxPt.z == center.z))
+    //    std::cout << "ERR: greatest distance is center point?" << std::endl;
 
-    std::cout << "Greatest point in dataset of size " << sizeof(points) - (sizeof(points[0]) / sizeof(float)) << ": {" << maxPt.x << ", " << maxPt.y << ", " << maxPt.z << "}." << std::endl;
+    //std::cout << "Greatest point in dataset of size " << sizeof(points) - (sizeof(points[0]) / sizeof(float)) << ": {" << maxPt.x << ", " << maxPt.y << ", " << maxPt.z << "}." << std::endl;
     return maxPt;
-}
+};
 
 /** 
  *  Returns the next greatest point from the center .
@@ -114,10 +117,11 @@ inline Point findKGreatest(Point center, Point points[], int k)
     }
     
     // Debug message; if there's an error with k this will probably show up
-    if ( sizeof(points) - (sizeof(points[0]) / sizeof(float)) == pts.size() ) std::cout << "ERR: Greatest not removed." << std::endl;
+    //if ( sizeof(points) - (sizeof(points[0]) / sizeof(float)) == pts.size() ) 
+    //    std::cout << "ERR: Greatest not removed." << std::endl;
 
     return findGreatest(center, pts.data(), pts.size());
-}
+};
 
 /**
  *  Gets the center of the specified point arrays by averaging the max and min points.
@@ -134,7 +138,7 @@ inline Point findCenter(Point points[], int n)
     for (int i = 0; i < n; i++)
     {
         //std::cout << "Iteration: " << i << ", center: {" << center.x << ", " << center.y << ", " << center.z << "}, point: " << std::endl;
-        std::cout << points[i].x << ", " << points[i].y << ", " << points[i].z << "." << std::endl;
+        //std::cout << points[i].x << ", " << points[i].y << ", " << points[i].z << "." << std::endl;
         center.x += points[i].x;
         center.y += points[i].y;
         center.z += points[i].z;
@@ -149,7 +153,7 @@ inline Point findCenter(Point points[], int n)
     //center.z = (max.z + min.z) / 2;
 
     return center;
-}
+};
 
 /**
  *  This method calculates the minimum sphere that can hold the points entered in stdin.
@@ -158,7 +162,7 @@ inline Point findCenter(Point points[], int n)
 inline std::pair<std::array<float,3>, float> Center()
 {
     // Pointer to a vector containing the points to be used
-    std::vector<Point>* points = new std::vector<Point>();
+    std::vector<Point> points; // = new std::vector<Point>();
 
     // The number of points in this cluster
     int n;
@@ -167,27 +171,27 @@ inline std::pair<std::array<float,3>, float> Center()
     std::ifstream source("../OGLBubbles/bin/input.txt");
     //source.open("../OGLBubbles/bin/input.txt", ios::in);
     bool first = true;
-    for (std::string line; getline(source, line);)
+    for ( std::string line; std::getline(source, line); )
     {
         Point point;
-        std::istringstream in(line);
+        std::istringstream inp(line);
 
         if ( first )
         {
-            in >> n;
+            inp >> n;
             first = false;
             continue;
         }
 
-        in >> point.x;
-        in >> point.y;
-        in >> point.z;
+        inp >> point.x;
+        inp >> point.y;
+        inp >> point.z;
 
         //point.x += 10.0f;
         //point.y += 10.0f;
         //point.z += 10.0f;
 
-        points->push_back(point);
+        points.push_back(point);
     }
     source.close();
     //std::cout << "Point array size: " << points->size() << std::endl;
@@ -197,14 +201,14 @@ inline std::pair<std::array<float,3>, float> Center()
     Point oldCenter, oldGreatest;
 
     // Set up original circle (blue)
-    Point center    = findCenter(points->data(), points->size());
-    float radius    = distance(findGreatest(center, points->data(), points->size()), center);
+    Point center    = findCenter(points.data(), points.size());
+    float radius    = distance(findGreatest(center, points.data(), points.size()), center);
 
     originalR       = radius;
-    oldGreatest     = findGreatest(center, points->data(), points->size());
+    oldGreatest     = findGreatest(center, points.data(), points.size());
 
     // Log original
-    std::cout << "Original center: {" << center.x << ", " << center.y << ", " << center.z << "}, Original radius: " << radius << std::endl;
+    //std::cout << "Original center: {" << center.x << ", " << center.y << ", " << center.z << "}, Original radius: " << radius << std::endl;
 
     // Loop variables
     bool sameX, sameY;
@@ -221,7 +225,7 @@ inline std::pair<std::array<float,3>, float> Center()
         oldCenter = center;
 
         // Find the next greatest point
-        next = findKGreatest(center, points->data(), k);
+        next = findKGreatest(center, points.data(), k);
     
         // Difference between next greatest point and center of circle (used in line formula)
         v    = vSub(next, center);
@@ -253,7 +257,7 @@ inline std::pair<std::array<float,3>, float> Center()
         radius -= (radius - distance(next, oldCenter)) / 2;
 
         // Check if any points are excluded, if so expand the radius to fit them (could instead move center...?)
-        check = distance(findGreatest(center, points->data(), points->size()), center);
+        check = distance(findGreatest(center, points.data(), points.size()), center);
         if (check > radius) radius = check;
         
         // Revert state to previous if radius increased
@@ -266,16 +270,14 @@ inline std::pair<std::array<float,3>, float> Center()
         }
         //if ( radius == oldRadius ) break;
         //if ( k >= points->size() - 1 ) break;
-        oldGreatest = findGreatest(center, points->data(), points->size());
+        oldGreatest = findGreatest(center, points.data(), points.size());
     }
-
-    delete points;
 
     //std::cout << radius << std::endl;
     //std::cout << "Completed circle centering, new center: {" << center.x << ", " << center.z << ", " << center.y << "}, radius: " << radius << std::endl;
     //cout << "Previous center: {" << oldCenter.x << ", " << oldCenter.y << "}, previous radius: " << oldRadius << endl;
     std::array<float, 3> cent = {center.x, center.y, center.z};
     return std::make_pair(cent, radius);
-}
+};
 
 #endif

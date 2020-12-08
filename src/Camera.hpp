@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAMERA
+#define CAMERA
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -7,6 +7,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "OGLBLOG.hpp"
+
+/**
+ *  A header class for handling the viewport and input.
+ */
 class Camera
 {
     public:
@@ -24,7 +29,7 @@ class Camera
             pitch    = 0.0f;
             lastPosX = 0.0f;
             lastPosY = 0.0f;
-        }
+        };
         Camera(const Camera&) = delete;
         Camera& operator=(const Camera&) = delete;
         ~Camera() { }; // Deconstructor
@@ -44,13 +49,16 @@ class Camera
                 firstMouse = false;
             }*/
 
-            /*float xOff = xPos     - lastPosX;
-            float yOff = lastPosY - yPos;    // reversed since y-coordinates go from bottom to top
+            //float xOff = xPos     - lastPosX;
+            //float yOff = lastPosY - yPos;    // reversed since y-coordinates go from bottom to top
+
+            // Calculate the change in distance since the last frame (note: time here is dependent upon framerate...)
+            velocity = std::abs(std::sqrt(lastPosX * lastPosX + lastPosY * lastPosY) - std::sqrt( xPos * xPos + yPos * yPos));
 
             lastPosX = xPos;
             lastPosY = yPos;
 
-            float sensitivity = 0.1f; // TODO: Create Camera default sensitivity
+            /*float sensitivity = 0.1f; // TODO: Create Camera default sensitivity
             xOff *= sensitivity;
             yOff *= sensitivity;
 
@@ -68,8 +76,11 @@ class Camera
             direction.y = sin(glm::radians(pitch));
             direction.z = sin(glm::radians(yaw) ) * cos(glm::radians(pitch));
             //cameraFront = glm::normalize(direction);*/
-        }
+        };
 
+        /**
+         *  Processes the GLFW inputs and applies them to the viewport.
+         */
         void ProcessInput()
         {
             // Add any additional inputs you want to be aware of in the following style
@@ -89,19 +100,19 @@ class Camera
                 cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
             // Camera rotational movement
-            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS)
                 yaw   -= viewSpeed;
             if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
                 yaw   += viewSpeed;
-            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+            if (glfwGetKey(window, GLFW_KEY_UP   ) == GLFW_PRESS)
                 pitch += viewSpeed;
-            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            if (glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS)
                 pitch -= viewSpeed;
 
             // Camera rotational fix for edge behavior
-            if(pitch > 89.0f)
-                pitch = 89.0f;
-            if(pitch < -89.0f)
+            if (pitch >  89.0f)
+                pitch =  89.0f;
+            if (pitch < -89.0f)
                 pitch = -89.0f;
 
             // Updates viewport based on changes in pitch/yaw
@@ -110,7 +121,7 @@ class Camera
             direction.y = sin(glm::radians(pitch));
             direction.z = sin(glm::radians(yaw) ) * cos(glm::radians(pitch));
             cameraFront = glm::normalize(direction);
-        }
+        };
 
         /**
          *  Updates the camera.
@@ -118,7 +129,7 @@ class Camera
         void UpdateCamera()
         {
             view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        }
+        };
 
         /**
          *  Gets this Camera's current view (usually called by the Graphics for transforming objects).
@@ -127,20 +138,29 @@ class Camera
         glm::mat4 GetView()
         {
             return view;
-        }
+        };
+
+        /** Gets this Camera's last mouse position in the x direction. */
+        float GetX() { return lastPosX; };
+
+        /** Gets this Camera's last mouse position in the y direction. */
+        float GetY() { return lastPosY; };
+
+        /** Gets this Camera's current mouse velocity. */
+        float GetMouseVelocity() { return (velocity < 30.0f) ? velocity : 30.0f; };
 
     private:
-    // Camera position data
-    glm::vec3 cameraPos;
-    glm::vec3 cameraFront;
-    glm::vec3 cameraUp;
-    glm::mat4 view;
-    float yaw;
-    float pitch;
-    float lastPosX;
-    float lastPosY;
+        glm::vec3 cameraPos;    // Camera position data.
+        glm::vec3 cameraFront;  // Camera front position.
+        glm::vec3 cameraUp;     // Camera up position.
+        glm::mat4 view;         // The current view matrix.
+        float yaw;              // The current yaw value of the camera.
+        float pitch;            // The current pitch value of the camera.
+        float lastPosX;         // The last X position of the mouse.
+        float lastPosY;         // The last Y position of the mouse.
+        float velocity;         // The derived velocity of the mouse.
 
-    GLFWwindow* window;
+        GLFWwindow* window;
 };
 
 #endif

@@ -2,23 +2,29 @@
 #define GLFW_DLL
 #endif
 
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
-//#include <GLFW/glfw3native.h>
+#include "Graphics.hpp"
 
-#include "Graphics.h"
-#include "BubbleError.h"
-#include <iostream>
-#include "Shader.h"
+// std libraries
 #include <vector>
-#include "Centroid.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <ios>
 
 // OpenGL Mathematics library
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-using namespace std;
+//#include <glad/glad.h>
+//#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3native.h>
+
+// Local libraries
+#include "OGLBLOG.hpp"
+#include "Shader.hpp"
+#include "Centroid.hpp"
 
 Graphics::Graphics(GLFWwindow* wnd, Camera* cam, float radius)
 {
@@ -29,6 +35,7 @@ Graphics::Graphics(GLFWwindow* wnd, Camera* cam, float radius)
     maxSize = 6;
     shaders.resize(maxSize);
     VAOs = new unsigned int [maxSize];
+    VBOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
     sphere = new Sphere(radius);
 
@@ -37,7 +44,7 @@ Graphics::Graphics(GLFWwindow* wnd, Camera* cam, float radius)
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
     view        = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);*/
-};
+}
 
 void Graphics::GenerateCluster(int index)
 {
@@ -45,10 +52,10 @@ void Graphics::GenerateCluster(int index)
     int n;
 
     // Read in points
-    ifstream source;
+    std::ifstream source;
     try
     {
-        source.open("../OGLBubbles/bin/input.txt", ios::in);
+        source.open("../OGLBubbles/bin/input.txt", std::ios::in);
     }
     catch (std::ios_base::failure &ex)
     {
@@ -61,11 +68,12 @@ void Graphics::GenerateCluster(int index)
         return;
     }
     bool first = true;
-    std::vector<float> vertices = vector<float>();
+    std::vector<float> vertices = std::vector<float>();
     
-    for (string line; getline(source, line);)
+    // Iterates over the input
+    for ( std::string line; std::getline(source, line); )
     {
-        istringstream in(line);
+        std::istringstream in(line);
 
         if ( first )
         {
@@ -74,7 +82,10 @@ void Graphics::GenerateCluster(int index)
             continue;
         }
 
-        float p1, p2, p3;
+        float p1;
+        float p2;
+        float p3;
+        
         in >> p1;
         in >> p2;
         in >> p3;
@@ -157,30 +168,6 @@ void Graphics::EndFrame()
 {
     glfwSwapBuffers(window);
 }
-
-/*
-void Graphics::UpdateCamera()
-{
-    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-}*/
-
-/*void Graphics::ProcessInput()
-{
-    // Add any additional inputs you want to be aware of in the following style
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    const float cameraSpeed = 0.05f; // adjust accordingly
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-
-}*/
 
 void Graphics::CreateShaders()
 {
@@ -376,27 +363,28 @@ void Graphics::GenerateSphere(int index)
     std::vector <float>        vertices = sphere->GetVertices();
     std::vector <unsigned int> indices  = sphere->GetIndices();
     
-    
     // Divide the icosahedron into a more spherical object
     sphere->Divide(1);
 
     unsigned int oldSize  = vertices.size();
     unsigned int oldSize2 = indices.size();
+
     vertices = sphere->GetVertices();
     indices  = sphere->GetIndices();
 
-    std::cout << "New vertices size (was " << oldSize  / 3 << "): " << vertices.size() / 3 << std::endl;
-    std::cout << "New indices size (was "  << oldSize2 / 3 << "): " << indices.size()  / 3 << std::endl;
+    // Debug
+    //std::cout << "New vertices size (was " << oldSize  / 3 << "): " << vertices.size() / 3 << std::endl;
+    //std::cout << "New indices size (was "  << oldSize2 / 3 << "): " << indices.size()  / 3 << std::endl;
 
-    // Following is the typical OpenGL generation
+    // Graphics Pipeline Step 1: Generate buffers & vertex/index arrays
     unsigned int VBO;
     glGenBuffers(1, &VBO);
+    VBOs[index] = VBO;
 
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     VAOs[index] = VAO;
 
-    // Input element buffer
     unsigned int EBO;
     glGenBuffers(1, &EBO);
     EBOs[index] = EBO;
@@ -410,14 +398,22 @@ void Graphics::GenerateSphere(int index)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices.front()), static_cast<void*>(vertices.data()), GL_STATIC_DRAW);
 
-
     // Step 3. Set the vertex attribute pointers and enable them
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // color attribute
+    // Color attribute (include if the vertex object has hard coded colors)
     //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3* sizeof(float)));
     //glEnableVertexAttribArray(1);
+}
+
+void Graphics::RegenSphere(int index)
+{
+    std::vector <float> vertices = sphere->GetVertices();
+
+    glBindVertexArray(VAOs[index]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[index]);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices.front()), static_cast<void*>(vertices.data()), GL_STATIC_DRAW);
 }
 
 void Graphics::DrawSphere(int index)
@@ -516,15 +512,15 @@ void Graphics::Transform(float width, float height)
     //view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
     projection = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
 
-    // retrieve the matrix uniform locations
+    // Retrieve the matrix uniform locations
     unsigned int modelLoc = glGetUniformLocation(shaders.back()->ID, "model");
     unsigned int viewLoc  = glGetUniformLocation(shaders.back()->ID, "view" );
 
-    // pass them to the shaders (3 different ways)
+    // Pass them to the shaders (3 different ways)
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)   );
     glUniformMatrix4fv(viewLoc,  1, GL_FALSE, &camera->GetView()[0][0]);
     
-    // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+    // Note: Projection matrix rarely changes, refactor this outside of the main rendering loop
     glUniformMatrix4fv(glGetUniformLocation(shaders.back()->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
 }
 
@@ -537,17 +533,73 @@ void Graphics::SetMaxSize(int size)
 
 void Graphics::Mouse(GLFWwindow* window, double xpos, double ypos)
 {
+    // Stub
+}
 
+void Graphics::Collision(std::array<float,3> vertex, float magnitude)
+{
+    // Stub
+    sphere->Collision(vertex, magnitude);
+}
+
+void Graphics::CollisionCheck(float x, float y, float velocity)
+{
+    // Get rough sphere bounds
+    // Model center! {0,0}!!! need to project this into world space
+    std::array<float,3> center = sphere->FindCenter();
+    float radius = sphere->GetRadius();
+
+    // Transform model center into worldspace
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // TODO: Multiply center point by model -> world space transformation
+    
+
+    // TODO: Transform x, y position into screen percentage
+
+    // TODO: Transform screen percentage into view space coordinates
+
+    // Check if x,y is within sphere
+    if ( (x != 0.0f && y != 0.0f) && (((x - center[0]) * (x - center[0]) + (y - center[1]) * (y - center[1]) /*+ (z - center[2]) * (z - center[2])*/ ) < radius * radius) )
+    {
+        std::cout << "Collision detected: {" << x << ", " << y << "}, velocity {" << velocity << "}." << std::endl;
+        Collision({x, y, center[2]}, velocity);
+    }
+    else 
+    {
+        std::cout << "No collision detected, distance: {x: " << x << ", " << center[0] << "},  {y: " << y << ", " << center[1] << "}." << std::endl;
+    }
+
+    /*// Old code, delete later (it doesn't even check the triangles...)
+    std::vector<float> vertices = sphere->GetVertices();
+    for (int i = 0; i < vertices.size(); i += 3)
+    {
+        if (vertices[i] == x && vertices[i + 1] == y && !(x == 0 && y == 0))
+        {
+            std::cout << "Collision detected: [" << x << ", " << y << "]." << std::endl;
+            Collision({vertices[i], vertices[i + 1], vertices[i + 2] }, 0.05f);
+            break;
+        }
+    }*/
 }
 
 void Graphics::Close()
 {
-    glfwTerminate();
-    if (sphere != NULL)
+    // Delete sphere object
+    if ( sphere != NULL )
         delete sphere;
-    for (auto shader : shaders) if (shader != NULL) delete shader;
-    delete VAOs;   // Handled by glfwTerminate?
-    delete EBOs;   // Handled by glfwTerminate?
-    //delete camera; // handled by OGLBubbles
-    //delete window; // handled by glfwTerminate
+
+    // Delete shaders (glfwTerminate might already handle this...)
+    for (auto shader : shaders) 
+        if (shader != NULL) 
+            delete shader;
+
+    glfwTerminate();
+
+    //delete VAOs;   // Handled by glfwTerminate?
+    //delete EBOs;   // Handled by glfwTerminate?
+
+    //delete camera; // Handled by OGLBubbles
+    //delete window; // Handled by glfwTerminate
 }

@@ -1,12 +1,14 @@
-#include "Sphere.h"
+#include "Sphere.hpp"
+
 #include <vector>
 #include <iostream>
 #include <array>
-
-#include <glm/glm.hpp>
 #include <map>
 
-using namespace std;
+#include <glm/glm.hpp>
+
+#include "OGLBLOG.hpp"
+
 using namespace glm;
 using Map = std::map<std::pair<unsigned int, unsigned int>, unsigned int>;
 
@@ -29,7 +31,7 @@ Sphere::Sphere(float r)
         {
             element = 
             {
-                ( i % 2 == 0 ) ? -1.0f : 1.0f,
+                ( i % 2 == 0 ) ? -1.0f :  1.0f,
                 ( i     <= 1 ) ? t     : -1.0f * t,
                 0.0f
             };
@@ -40,7 +42,7 @@ Sphere::Sphere(float r)
             element = 
             {
                 0.0f,
-                ( i % 2 == 0 ) ? -1.0f : 1.0f,
+                ( i % 2 == 0 ) ? -1.0f :  1.0f,
                 ( i     <= 5 ) ? t     : -1.0f * t
             };
             vertices[i] = element;
@@ -51,7 +53,7 @@ Sphere::Sphere(float r)
             {
                 ( i     <= 9 ) ? t     : -1.0f * t,
                 0.0f,
-                ( i % 2 == 0 ) ? -1.0f : 1.0f
+                ( i % 2 == 0 ) ? -1.0f :  1.0f
             };
             vertices[i] = element;
         }
@@ -111,7 +113,6 @@ Sphere::Sphere(float r)
 std::vector<unsigned int> Sphere::GetIndices()
 {
     std::vector<unsigned int> indOutput;
-    //indOutput.resize(indices.size() * 3); // push_back updates size
 
     // Converts indices vector of 3-arrays into a single-dimension array vector
     for (int i = 0; i < indices.size(); i++)
@@ -127,7 +128,6 @@ std::vector<unsigned int> Sphere::GetIndices()
 std::vector<float> Sphere::GetVertices()
 {
     std::vector<float> vertOutput;
-    //vertOutput.resize(vertices.size() * 3);
 
     // Converts vertices vector of 3-arrays into a single-dimension array vector
     for (int i = 0; i < vertices.size(); i++)
@@ -140,13 +140,10 @@ std::vector<float> Sphere::GetVertices()
     return vertOutput;
 }
 
-
 void Sphere::Divide(int divisions)
 {
     for (int i = 0; i < divisions; i++)
-    {
         Subdivision();
-    }
 }
 
 void Sphere::Subdivision()
@@ -156,16 +153,13 @@ void Sphere::Subdivision()
     std::vector<std::array<float,        3>> oldVerts = vertices;
     indices.clear();
     vertices.clear();
-    //indices.resize(0); // Do you want critical errors? Because that's how you get critical errors
-    //vertices.resize(0);
 
     // A map of vertex pairs with a unique id; allows better comparison than float == float (currently unchecked)
-    Map* map = new Map();
+    Map map;
     std::array<unsigned int, 3> oldTriad  = {0u, 0u, 0u};
     std::array<unsigned int, 3> triad     = {0u, 0u, 0u};
     std::array<unsigned int, 3> tempTriad = {0u, 0u, 0u};
     std::vector<std::array<float, 3>> triangle;
-    //unsigned int index = 0u;
 
     // Loop through each index triad/triangle
     for (auto tri : oldInds)
@@ -176,9 +170,6 @@ void Sphere::Subdivision()
             //auto res = AddVertex(triangle[j]);
             oldTriad[i] = AddVertex(oldVerts[tri[i]], map).first; // Unchecked addition
         }
-
-        // Do I really want this old triangle? hm...
-        //indices.push_back(oldTriad);
 
         // Gets the midpoint of each triangle edge
         //        o
@@ -213,14 +204,9 @@ void Sphere::Subdivision()
         indices.push_back(tempTriad);
         //index += 3u;
     }
-
-    // Might want to check that this does the right thing...
-    //indices = newInds;
-    //vertices = newVerts;
-    delete map;
 }
 
-std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex, Map* map)
+std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex, Map map)
 {
     bool         hasV = false;
     unsigned int vInd = 0u;
@@ -236,11 +222,11 @@ std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex, Map*
         }
     }
 
-    // Add the vertex if it doesn't exist
+    // Add the vertex if it doesn't exist (possible source for index errors)
     if ( !hasV )
     {
         vertices.push_back(vertex);
-        vInd = vertices.size() - 1; // this smells like heap corruption...
+        vInd = vertices.size() - 1;
     }
 
     return std::make_pair(vInd, hasV);
@@ -250,27 +236,23 @@ std::array<float,3> Sphere::MidPoint(unsigned int x, unsigned int y)
 {
     std::array<float,3> newVertex = {0.0f, 0.0f, 0.0f};
 
-        // Calculate the new vertex's 3D position
-        for (int i = 0; i < 3; i++)
-            newVertex[i] = (vertices[x][i] + vertices[y][i]) / 2.0f;
+    // Calculate the new vertex's 3D position (TODO: assert check bounds here)
+    for (int i = 0; i < 3; i++)
+        newVertex[i] = (vertices[x][i] + vertices[y][i]) / 2.0f;
 
-        // Scale the new vertices to the unit circle (normalization)
-        float scale = radius / std::sqrtf
-            (
-                (newVertex[0] * newVertex[0]) + 
-                (newVertex[1] * newVertex[1]) + 
-                (newVertex[2] * newVertex[2]) 
-            );
-        
-        for (int i = 0; i < 3; i++)
-            newVertex[i] *= scale;
+    // Scale the new vertices to the unit circle (normalization)
+    float scale = radius / std::sqrtf
+        (
+            (newVertex[0] * newVertex[0]) + 
+            (newVertex[1] * newVertex[1]) + 
+            (newVertex[2] * newVertex[2]) 
+        );
+    
+    for (int i = 0; i < 3; i++)
+        newVertex[i] *= scale;
 
-        // Returns the new vertex
-        return newVertex;
-
-
-
-
+    // Returns the new vertex
+    return newVertex;
 
     /*
     // NOTE: indices[x] doesn't follow this pattern:
@@ -324,4 +306,47 @@ std::array<float,3> Sphere::MidPoint(unsigned int x, unsigned int y)
 float Sphere::GetRadius()
 {
     return radius;
+}
+
+void Sphere::Collision(std::array<float,3> vertex, float magnitude)
+{
+    // Calculate vertex's unit vector to get pure direction
+    float mag = std::sqrt(std::pow(vertex[0], 2) + std::pow(vertex[1], 2) + std::pow(vertex[2], 2));
+    vertex[0] /= mag;
+    vertex[1] /= mag;
+    vertex[2] /= mag;
+    //std::cout << "Vertex: [" << vertex[0] << ", " << vertex[1] << ", " << vertex[2] << "]." << std::endl;
+
+    // Apply a fraction of the collision magnitude based on distance to vertex
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        float vMag   = std::sqrt(std::pow(vertices[i][0], 2) + std::pow(vertices[i][1], 2) + std::pow(vertices[i][2], 2));
+        float euDist = std::sqrt(std::pow(vertices[i][0] / vMag - vertex[0], 2) + std::pow(vertices[i][1] / vMag - vertex[1], 2) + std::pow(vertices[i][2] / vMag - vertex[2], 2));
+        //std::cout<< "Dist: [" << euDist << "]." << std::endl;
+        //if (euDist > 2.0f || euDist < 0.5f) euDist = 1.0f;
+        float fraction = 1.0f + (euDist / 10);
+
+        for (int j = 0; j < 3; j++)
+        {
+            vertices[i][j] *= (euDist * (1 + magnitude));
+        }
+    }
+}
+
+std::array<float,3> Sphere::FindCenter()
+{
+    std::array<float,3> center = {0.0f, 0.0f, 0.0f};
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        center[0] += vertices[i][0];
+        center[1] += vertices[i][1];
+        center[2] += vertices[i][2];
+    }
+
+    center[0] /= vertices.size();
+    center[1] /= vertices.size();
+    center[2] /= vertices.size();
+
+    return center;
 }
