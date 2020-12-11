@@ -171,6 +171,16 @@ void Sphere::Subdivision()
             oldTriad[i] = AddVertex(oldVerts[tri[i]]/*, map*/).first; // Unchecked addition
         }
 
+        /*// Normals - INCOMPLETE
+        ///Calculate two edge of the triangle
+        //Vector3f edge1 = subtract(v0, v1);
+        //Vector3f edge2 = subtract(v1, v2);
+        
+
+        //Calculate face normal
+        //Vector3f normal = normalize(crossProduct(edge1, edge2));
+        */
+       
         // Gets the midpoint of each triangle edge
         //        o
         //      o   o

@@ -28,49 +28,39 @@ int main()
     Log l;
     if ( !init() )
         return -1;
-    
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // Comment out for normal drawing
+
     // Loops while the window is open so graphics keep being drawn
     l.d("Initialization complete. Beginning render loop.");
     while ( !glfwWindowShouldClose(Window) )
     {
-        // Draw things in the render loop! 
-        // Note that the thrown exceptions are caught so that the debug window prints related info
-        try
-        {
-            // Process any inputs
-            Cam->ProcessInput();
+        // Process any inputs
+        Cam->ProcessInput();
 
-            // Physics - Incomplete, don't use
-            //Gfx->CollisionCheck(Cam->GetX(), Cam->GetY(), Cam->GetMouseVelocity());
-            //Gfx->RegenSphere(0);
+        // Physics - Incomplete, don't use
+        //Gfx->CollisionCheck(Cam->GetX(), Cam->GetY(), Cam->GetMouseVelocity());
+        //Gfx->RegenSphere(0);
 
-            // Clear the back buffer before drawing to it
-            Gfx->ClearBuffer(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Clear the back buffer before drawing to it
+        Gfx->ClearBuffer(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Create transformations according to camera position
-            Cam->UpdateCamera(); // Previously was at end of frame, check if this needs to be refactored
+        // Create transformations according to camera position
+        Cam->UpdateCamera(); // Previously was at end of frame, check if this needs to be refactored
 
-            // Light
-            Gfx->UseShader(0);
-            Gfx->TransformLight(800.0f, 600.0f, 0);
-            Gfx->DrawCube(0, 0);
+        // Light (Cube)
+        Gfx->UseShader(0);
+        Gfx->TransformLight(800.0f, 600.0f, 0);
+        Gfx->DrawCube(0, 0);
 
-            // Sphere
-            Gfx->UseShader(1);
-            Gfx->Transform(800.0f, 600.0f, 1);
-            Gfx->DrawSphere(1, 1);
+        // Sphere
+        Gfx->UseShader(0);
+        Gfx->Transform(800.0f, 600.0f, 0);
+        Gfx->DrawSphere(1, 0);
 
-            // Swap the front and back buffers and processes pending glfw events
-            Gfx->EndFrame();
-            glfwPollEvents();
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-            OGLBexit();
-            return -1;
-        }
+        // Swap the front and back buffers and processes pending glfw events
+        Gfx->EndFrame();
+        glfwPollEvents();
     }
 
     OGLBexit();
@@ -175,7 +165,6 @@ bool init()
         glfwTerminate();
         return false;
     }
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // Comment out for normal drawing
 
     // Loads reusable graphics
     try

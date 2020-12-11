@@ -15,6 +15,6 @@ void main()
 {
     gl_Position = projection * view * model * vec4(aPos, 1.0f);
     PixPos = vec3(model * vec4(aPos, 1.0));
-    Normal = vec3( 0.5f ); //aNormal;
+    Normal = vec3( 0.5f );//aNormal;
     //vColor = aColor;
 }

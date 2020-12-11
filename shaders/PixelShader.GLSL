@@ -23,7 +23,7 @@ void main()
     vec3  norm     = normalize(Normal);
     vec3  lightDir = normalize(lightPos - PixPos);
     
-    vec3  diffuse  = max(dot(norm, lightDir), 0.0) * lightColor;
+    vec3  diff  = max(dot(norm, lightDir), 0.0) * lightColor;
 
     // Lighting calculation
     vec3  result   = (ambient + diff) + diff * objectColor;
