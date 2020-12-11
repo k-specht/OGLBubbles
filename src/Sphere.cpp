@@ -10,7 +10,7 @@
 #include "OGLBLOG.hpp"
 
 using namespace glm;
-using Map = std::map<std::pair<unsigned int, unsigned int>, unsigned int>;
+//using Map = std::map<std::pair<unsigned int, unsigned int>, unsigned int>;
 
 Sphere::Sphere(float r)
 {
@@ -155,7 +155,7 @@ void Sphere::Subdivision()
     vertices.clear();
 
     // A map of vertex pairs with a unique id; allows better comparison than float == float (currently unchecked)
-    Map map;
+    //Map map;
     std::array<unsigned int, 3> oldTriad  = {0u, 0u, 0u};
     std::array<unsigned int, 3> triad     = {0u, 0u, 0u};
     std::array<unsigned int, 3> tempTriad = {0u, 0u, 0u};
@@ -168,7 +168,7 @@ void Sphere::Subdivision()
         for (int i = 0; i < 3; i++)
         {
             //auto res = AddVertex(triangle[j]);
-            oldTriad[i] = AddVertex(oldVerts[tri[i]], map).first; // Unchecked addition
+            oldTriad[i] = AddVertex(oldVerts[tri[i]]/*, map*/).first; // Unchecked addition
         }
 
         // Gets the midpoint of each triangle edge
@@ -187,7 +187,7 @@ void Sphere::Subdivision()
         for (int j = 0; j < 3; j++)
         {
             //auto res = AddVertex(triangle[j]);
-            triad[j] = AddVertex(triangle[j], map).first; // Unchecked addition
+            triad[j] = AddVertex(triangle[j]/*, map*/).first; // Unchecked addition
         }
         
         // Pushes the four new triangles to the end of the new indices list
@@ -206,7 +206,7 @@ void Sphere::Subdivision()
     }
 }
 
-std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex, Map map)
+std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex/*, Map map*/)
 {
     bool         hasV = false;
     unsigned int vInd = 0u;
@@ -230,29 +230,6 @@ std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex, Map 
     }
 
     return std::make_pair(vInd, hasV);
-}
-
-std::array<float,3> Sphere::MidPoint(unsigned int x, unsigned int y)
-{
-    std::array<float,3> newVertex = {0.0f, 0.0f, 0.0f};
-
-    // Calculate the new vertex's 3D position (TODO: assert check bounds here)
-    for (int i = 0; i < 3; i++)
-        newVertex[i] = (vertices[x][i] + vertices[y][i]) / 2.0f;
-
-    // Scale the new vertices to the unit circle (normalization)
-    float scale = radius / std::sqrtf
-        (
-            (newVertex[0] * newVertex[0]) + 
-            (newVertex[1] * newVertex[1]) + 
-            (newVertex[2] * newVertex[2]) 
-        );
-    
-    for (int i = 0; i < 3; i++)
-        newVertex[i] *= scale;
-
-    // Returns the new vertex
-    return newVertex;
 
     /*
     // NOTE: indices[x] doesn't follow this pattern:
@@ -301,6 +278,29 @@ std::array<float,3> Sphere::MidPoint(unsigned int x, unsigned int y)
 
     // Returns the iterator's map id of the (maybe new) vertex
     return inserted.first->second;*/
+}
+
+std::array<float,3> Sphere::MidPoint(unsigned int x, unsigned int y)
+{
+    std::array<float,3> newVertex = {0.0f, 0.0f, 0.0f};
+
+    // Calculate the new vertex's 3D position (TODO: assert check bounds here)
+    for (int i = 0; i < 3; i++)
+        newVertex[i] = (vertices[x][i] + vertices[y][i]) / 2.0f;
+
+    // Scale the new vertices to the unit circle (normalization)
+    float scale = radius / std::sqrtf
+        (
+            (newVertex[0] * newVertex[0]) + 
+            (newVertex[1] * newVertex[1]) + 
+            (newVertex[2] * newVertex[2]) 
+        );
+    
+    for (int i = 0; i < 3; i++)
+        newVertex[i] *= scale;
+
+    // Returns the new vertex
+    return newVertex;
 }
 
 float Sphere::GetRadius()

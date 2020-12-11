@@ -59,16 +59,16 @@ class Sphere
          *  Adds the provided vertex to the list or returns its id.
          *  TODO: Add hashmap checking instead of sequential search.
          *  @param vertex - The vertex to be added to the end of the list.
-         *  @param map    - The vertex pair map to be checked for existing index pairings.
-         *  @return A pairing of the existing vertex's index and false, or 0u and true if it is added.
-         */
-        std::pair<unsigned int,bool> AddVertex( std::array<float,3> vertex, std::map<std::pair<unsigned int, unsigned int>, unsigned int> map );
+         *  
+         *  @return A pairing of the existing vertex's index and false, or size - 1 and true if it is added.
+         */ // @param map    - The vertex pair map to be checked for existing index pairings. (removed for now)
+        std::pair<unsigned int,bool> AddVertex( std::array<float,3> vertex/*, std::map<std::pair<unsigned int, unsigned int>, unsigned int> map */);
 
         /**
          *  Adds a new vertex to the back of the vertices list.
          *  @param one - The start vertex of the mid-point to be calculated.
          *  @param two - The end vertex of the mid-point to be calculated.
-         *  @return The index of the existing midpoint, or size() - 1 if a new vertex was added to the end.
+         *  @return The vertex corresponding to the middle point between one and two.
          */
         std::array<float,3> MidPoint
         (

@@ -12,19 +12,19 @@ void Log::setDebug(bool debug_on)
     debug = debug_on; 
 }
 
-inline void Log::e(const char* message)
+void Log::e(const char* message)
 {
     if ( DEFAULT_DEBUG_MODE )
         std::cerr << message << std::endl;
 }
 
-inline void Log::d(const char* message)
+void Log::d(const char* message)
 {
     if ( DEFAULT_DEBUG_MODE ) 
         std::cout << message << std::endl;
 }
 
-inline void Log::f(const char* message)
+void Log::f(const char* message)
 {
     if ( DEFAULT_DEBUG_MODE )
     {

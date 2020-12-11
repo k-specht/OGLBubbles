@@ -73,18 +73,34 @@ class Graphics
 
         /**
          *  Activates the last shader entered into the shader list.
+         *  @param shaderID - The index of the shader to set as active.
          */
-        void UseShader();
+        void UseShader(int shaderID);
 
         /**
          *  Creates matrix transformations.
          *  @param width  - The screen width.
          *  @param height - The screen height.
+         *  @param shaderID - The index of the shader to use.
          */
         void Transform
         (
             float width,
-            float height
+            float height,
+            int shaderID
+        );
+
+        /**
+         *  Creates matrix transformations for the light source.
+         *  @param width  - The screen width.
+         *  @param height - The screen height.
+         *  @param shaderID - The index of the shader to use.
+         */
+        void TransformLight
+        (
+            float width,
+            float height,
+            int shaderID
         );
 
         /**
@@ -143,25 +159,25 @@ class Graphics
          *  Draws a sphere to the screen using the graphics pipeline.
          *  @param index - The index of the VAO for this drawable object.
          */
-        void DrawSphere(int index);
+        void DrawSphere(int index, int shaderID);
 
         /**
          *  Draws a cube to the screen using the graphics pipeline.
          *  @param index - The index of the VAO for this drawable object.
          */
-        void DrawCube(int index);
+        void DrawCube(int index, int shaderID);
 
         /**
          *  Draws a triangle to the screen using the graphics pipeline.
          *  @param index - The index of the VAO for this drawable object.
          */
-        void DrawTriangle(int index);
+        void DrawTriangle(int index, int shaderID);
 
         /**
          *  Draws a triangle to the screen using the graphics pipeline.
          *  @param index - The index of the VAO for this drawable object.
          */
-        void DrawRectangle(int index);
+        void DrawRectangle(int index, int shaderID);
 
 
         /**
@@ -226,6 +242,8 @@ class Graphics
         GLFWwindow* window; // A pointer to the window this Graphics instance paints to.
 
         int maxSize;        // The maximum shader capacity of this graphics object (defaults to 6).
+
+        glm::vec3 lightPos = {1.2f, 1.0f, 2.0f}; // The position of the light source in this graphics scene.
 
         std::vector<Shader*> shaders; // This Graphics object's shader vector; holds shader programs for OpenGL.
 

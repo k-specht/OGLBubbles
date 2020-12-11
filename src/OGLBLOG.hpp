@@ -17,13 +17,13 @@ class Log
          *  Prints an error message if debug mode is enabled.
          *  @param message - The message to be printed to cerr.
          */
-        static void e(const char* message);
+        void e(const char* message);
 
         /**
          *  Prints a debug message if debug mode is enabled.
          *  @param message - The message to be printed to cout.
          */
-        static void d(const char* message);
+        void d(const char* message);
 
         /**
          *  Prints a debug message to the log file if debug mode is enabled.
@@ -31,7 +31,7 @@ class Log
          *  TODO: Implement the log file writer.
          *  @param message - The message to be printed to the log file.
          */
-        static void f(const char* message);
+        void f(const char* message);
 
     private:
         static const bool DEFAULT_DEBUG_MODE = true; // Default mode for debug

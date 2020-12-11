@@ -25,10 +25,12 @@ GLFWwindow* Window; // Global pointer to the window object
 int main()
 {
     // Initializes GLFW window, shaders and graphics objects
+    Log l;
     if ( !init() )
         return -1;
     
     // Loops while the window is open so graphics keep being drawn
+    l.d("Initialization complete. Beginning render loop.");
     while ( !glfwWindowShouldClose(Window) )
     {
         // Draw things in the render loop! 
@@ -43,47 +45,21 @@ int main()
             //Gfx->RegenSphere(0);
 
             // Clear the back buffer before drawing to it
-            Gfx->ClearBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+            Gfx->ClearBuffer(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Create transformations according to camera position
             Cam->UpdateCamera(); // Previously was at end of frame, check if this needs to be refactored
-            Gfx->Transform(800.0f, 600.0f);
-            Gfx->DrawSphere(0);
 
-            /**
-             * // be sure to activate shader when setting uniforms/drawing objects
-                lightingShader.use();
-                lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-                lightingShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+            // Light
+            Gfx->UseShader(0);
+            Gfx->TransformLight(800.0f, 600.0f, 0);
+            Gfx->DrawCube(0, 0);
 
-                // view/projection transformations
-                glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-                glm::mat4 view = camera.GetViewMatrix();
-                lightingShader.setMat4("projection", projection);
-                lightingShader.setMat4("view", view);
-
-                // world transformation
-                glm::mat4 model = glm::mat4(1.0f);
-                lightingShader.setMat4("model", model);
-
-                // render the cube
-                glBindVertexArray(cubeVAO);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-
-
-                // also draw the lamp object
-                lightCubeShader.use();
-                lightCubeShader.setMat4("projection", projection);
-                lightCubeShader.setMat4("view", view);
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, lightPos);
-                model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-                lightCubeShader.setMat4("model", model);
-
-                glBindVertexArray(lightCubeVAO);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-             */
+            // Sphere
+            Gfx->UseShader(1);
+            Gfx->Transform(800.0f, 600.0f, 1);
+            Gfx->DrawSphere(1, 1);
 
             // Swap the front and back buffers and processes pending glfw events
             Gfx->EndFrame();
@@ -123,7 +99,14 @@ void OGLBexit()
 
 void error_callback(int error_code, const char* description)
 {
-    std::cerr << description << std::endl;
+    // Prints to err
+    std::cerr << "ERR" << error_code << ": " << description << std::endl;
+
+    // Prints to log file
+    std::string filePath = "../OGLBubbles/bin/log.txt";
+    std::ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app );
+    ofs << "ERR" << error_code << ": " << description << std::endl;
+    ofs.close();
 }
 
 bool init()
@@ -198,7 +181,8 @@ bool init()
     try
     {
         Gfx->CreateShaders();
-        Gfx->GenerateSphere(0);
+        Gfx->GenerateCube(0);
+        Gfx->GenerateSphere(1);
     }
     catch (const std::exception& e)
     {

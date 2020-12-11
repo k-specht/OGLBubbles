@@ -33,7 +33,7 @@ Graphics::Graphics(GLFWwindow* wnd, Camera* cam, float radius)
 
     // Initializes shader array to the default max size
     maxSize = 6;
-    shaders.resize(maxSize);
+    //shaders.resize(maxSize);
     VAOs = new unsigned int [maxSize];
     VBOs = new unsigned int [maxSize];
     EBOs = new unsigned int [maxSize];
@@ -171,13 +171,19 @@ void Graphics::EndFrame()
 
 void Graphics::CreateShaders()
 {
+    shaders.push_back(new Shader(".\\shaders\\LightVS.GLSL", ".\\shaders\\LightPS.GLSL"));
+    //shaders[0]->use();
+
     shaders.push_back(new Shader(".\\shaders\\VertexShader.GLSL", ".\\shaders\\PixelShader.GLSL"));
-    //shaders.back()->use();
+    //shaders[1]->use();
+    glUniform3f(glGetUniformLocation(shaders[1]->ID, "objectColor"), 1.0f, 0.5f, 0.31f);
+    glUniform3f(glGetUniformLocation(shaders[1]->ID, "lightColor" ), 1.0f, 1.0f, 1.0f );
+    glUniform3f(glGetUniformLocation(shaders[1]->ID, "lightPos" ), lightPos[0], lightPos[1], lightPos[2] );
 }
 
-void Graphics::UseShader()
+void Graphics::UseShader(int shaderID)
 {
-    shaders.back()->use();
+    shaders[shaderID]->use();
 }
 
 void Graphics::GenerateRectangle(int index)
@@ -416,10 +422,10 @@ void Graphics::RegenSphere(int index)
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices.front()), static_cast<void*>(vertices.data()), GL_STATIC_DRAW);
 }
 
-void Graphics::DrawSphere(int index)
+void Graphics::DrawSphere(int index, int shaderID)
 {
     // The final part of the process, this should be done in the render loop
-    glUseProgram(shaders.back()->ID);
+    glUseProgram(shaders[shaderID]->ID);
     //glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
     
@@ -429,7 +435,7 @@ void Graphics::DrawSphere(int index)
     glDrawElements(GL_TRIANGLES, sphere->GetIndices().size(), GL_UNSIGNED_INT, 0);
 }
 
-void Graphics::DrawCube(int index)
+void Graphics::DrawCube(int index, int shaderID)
 {
     // Step 4: Bind a VAO and draw the object
 
@@ -440,7 +446,7 @@ void Graphics::DrawCube(int index)
     //int vertexColorLocation = glGetUniformLocation(shaders.back()->ID, "timeColor");
 
     // The final part of the process, this should be done in the render loop
-    glUseProgram(shaders.back()->ID);
+    glUseProgram(shaders[shaderID]->ID);
     //glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
     
@@ -450,7 +456,7 @@ void Graphics::DrawCube(int index)
     //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
-void Graphics::DrawTriangle(int index)
+void Graphics::DrawTriangle(int index, int shaderID)
 {
     // Step 4: Bind a VAO and draw the object
 
@@ -458,10 +464,10 @@ void Graphics::DrawTriangle(int index)
     // Note that if you want to keep this idea, change sin to dot product
     float time              = glfwGetTime();
     float colorValue        = (sin(time)/2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaders.back()->ID, "timeColor");
+    int vertexColorLocation = glGetUniformLocation(shaders[shaderID]->ID, "timeColor");
 
     // The final part of the process, this should be done in the render loop
-    glUseProgram(shaders.back()->ID);
+    glUseProgram(shaders[shaderID]->ID);
     glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
     
@@ -471,7 +477,7 @@ void Graphics::DrawTriangle(int index)
     //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
-void Graphics::DrawRectangle(int index)
+void Graphics::DrawRectangle(int index, int shaderID)
 {
     // Step 4. Bind a VAO and draw the object
 
@@ -479,10 +485,10 @@ void Graphics::DrawRectangle(int index)
     // Note that if you want to keep this idea, change sin to dot product
     float time = glfwGetTime();
     float colorValue = (sin(time)/2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaders.back()->ID, "timeColor");
+    int vertexColorLocation = glGetUniformLocation(shaders[shaderID]->ID, "timeColor");
 
     // The final part of the process, this should be done in the render loop
-    glUseProgram(shaders.back()->ID);
+    glUseProgram(shaders[shaderID]->ID);
     glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
     glBindVertexArray(VAOs[index]);
 
@@ -490,7 +496,7 @@ void Graphics::DrawRectangle(int index)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Graphics::Transform(float width, float height)
+void Graphics::Transform(float width, float height, int shaderID)
 {
     /*// Initializes matrix to identity and translates it according to time
     glm::mat4 transform = glm::mat4(1.0f);
@@ -513,15 +519,42 @@ void Graphics::Transform(float width, float height)
     projection = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
 
     // Retrieve the matrix uniform locations
-    unsigned int modelLoc = glGetUniformLocation(shaders.back()->ID, "model");
-    unsigned int viewLoc  = glGetUniformLocation(shaders.back()->ID, "view" );
+    unsigned int modelLoc = glGetUniformLocation(shaders[shaderID]->ID, "model");
+    unsigned int viewLoc  = glGetUniformLocation(shaders[shaderID]->ID, "view" );
 
     // Pass them to the shaders (3 different ways)
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)   );
     glUniformMatrix4fv(viewLoc,  1, GL_FALSE, &camera->GetView()[0][0]);
     
     // Note: Projection matrix rarely changes, refactor this outside of the main rendering loop
-    glUniformMatrix4fv(glGetUniformLocation(shaders.back()->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(shaders[shaderID]->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
+}
+
+void Graphics::TransformLight(float width, float height, int shaderID)
+{
+    glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    //glm::mat4 view          = glm::mat4(1.0f);
+    glm::mat4 projection    = glm::mat4(1.0f);
+
+    //model      = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));//(float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    //view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+    //model      = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    //model      = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model      = glm::translate(model, lightPos);
+    model      = glm::scale(model, glm::vec3(0.1f));
+    projection = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
+
+    // Retrieve the matrix uniform locations
+    unsigned int modelLoc = glGetUniformLocation(shaders[shaderID]->ID, "model");
+    unsigned int viewLoc  = glGetUniformLocation(shaders[shaderID]->ID, "view" );
+
+    // Pass them to the shaders (3 different ways)
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)   );
+    glUniformMatrix4fv(viewLoc,  1, GL_FALSE, &camera->GetView()[0][0]);
+    
+    // Note: Projection matrix rarely changes, refactor this outside of the main rendering loop
+    glUniformMatrix4fv(glGetUniformLocation(shaders[shaderID]->ID, "projection"), 1, GL_FALSE, &projection[0][0]);
 }
 
 void Graphics::SetMaxSize(int size)
@@ -586,6 +619,8 @@ void Graphics::CollisionCheck(float x, float y, float velocity)
 
 void Graphics::Close()
 {
+    glfwTerminate();
+
     // Delete sphere object
     if ( sphere != NULL )
         delete sphere;
@@ -594,8 +629,6 @@ void Graphics::Close()
     for (auto shader : shaders) 
         if (shader != NULL) 
             delete shader;
-
-    glfwTerminate();
 
     //delete VAOs;   // Handled by glfwTerminate?
     //delete EBOs;   // Handled by glfwTerminate?
