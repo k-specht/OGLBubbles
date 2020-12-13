@@ -19,16 +19,15 @@ Graphics*   Gfx;    // Global pointer to the graphics object
 Camera*     Cam;    // Global pointer to the camera object
 GLFWwindow* Window; // Global pointer to the window object
 
-/**
- *  Entry point to the app, calls initialization functions and handles the render loop.
- */
+/** Entry point to the app, calls initialization functions and handles the render loop. */
 int main()
 {
     // Initializes GLFW window, shaders and graphics objects
     Log l;
     if ( !init() )
         return -1;
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // Comment out for normal drawing
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // Comment out for normal drawing
+    
 
     // Loops while the window is open so graphics keep being drawn
     l.d("Initialization complete. Beginning render loop.");
@@ -54,9 +53,9 @@ int main()
         Gfx->DrawCube(0, 0);
 
         // Sphere
-        Gfx->UseShader(0);
-        Gfx->Transform(800.0f, 600.0f, 0);
-        Gfx->DrawSphere(1, 0);
+        Gfx->UseShader(1);
+        Gfx->Transform(800.0f, 600.0f, 1);
+        Gfx->DrawSphere(1, 1);
 
         // Swap the front and back buffers and processes pending glfw events
         Gfx->EndFrame();
@@ -125,6 +124,14 @@ bool init()
         return false;
     }
     glfwMakeContextCurrent(Window);
+    // Code for adding a window icon
+    /*char[] pix = {};
+    GLFWimage img = {
+        50;
+        50;
+        &pix[0];
+    };
+    glfwSetWindowIcon(Window, 1, &img);*/
 
     if ( !gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) )
     {
@@ -175,7 +182,7 @@ bool init()
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << e.what() << std::endl;
         OGLBexit();
         return false;
     }

@@ -14,6 +14,14 @@ class Shader
          */
         Shader(const char* vertexShaderPath, const char* pixelShaderPath);
 
+        /**
+         *  Reads and compiles the shaders at the specified filename.
+         *  @param vertexShaderPath - The path and filename of the vertex shader you want to load.
+         *  @param pixelShaderPath  - The path and filename of the pixel shader you want to load.
+         *  @param geoPath          - The path and filename of the geometry shader you want to load.
+         */
+        Shader(const char* vertexShaderPath, const char* pixelShaderPath, const char* geoPath);
+
         ~Shader()  { }; // Deconstructor
         
         /**

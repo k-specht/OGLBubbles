@@ -107,6 +107,8 @@ Sphere::Sphere(float r)
         {9u, 8u, 1u }
     };
 
+    GenerateNormals();
+
     counter = 11;
 }
 
@@ -140,6 +142,43 @@ std::vector<float> Sphere::GetVertices()
     return vertOutput;
 }
 
+std::vector<float> Sphere::GetNormals()
+{
+    std::vector<float> normOutput;
+
+    // Converts normals vector of 3-arrays into a single-dimension array vector
+    for (int i = 0; i < normals.size(); i++)
+    {
+        normOutput.push_back(normals[i][0]);
+        normOutput.push_back(normals[i][1]);
+        normOutput.push_back(normals[i][2]);
+    }
+
+    return normOutput;
+}
+
+std::vector<float> Sphere::GetVertNorms()
+{
+    std::vector<float> out;
+
+    // Converts normals vector of 3-arrays into a single-dimension array vector
+    assert(normals.size() == vertices.size());
+    for (int i = 0; i < normals.size(); i++)
+    {
+        // Vertices
+        out.push_back(vertices[i][0]);
+        out.push_back(vertices[i][1]);
+        out.push_back(vertices[i][2]);
+
+        // Normals
+        out.push_back(normals[i][0]);
+        out.push_back(normals[i][1]);
+        out.push_back(normals[i][2]);
+    }
+
+    return out;
+}
+
 void Sphere::Divide(int divisions)
 {
     for (int i = 0; i < divisions; i++)
@@ -166,10 +205,7 @@ void Sphere::Subdivision()
     {
         // Adds the old vertices/indices to the new list (for indexing purposes)
         for (int i = 0; i < 3; i++)
-        {
-            //auto res = AddVertex(triangle[j]);
-            oldTriad[i] = AddVertex(oldVerts[tri[i]]/*, map*/).first; // Unchecked addition
-        }
+            oldTriad[i] = AddVertex(oldVerts[tri[i]]).first; // Unchecked addition
 
         /*// Normals - INCOMPLETE
         ///Calculate two edge of the triangle
@@ -180,7 +216,7 @@ void Sphere::Subdivision()
         //Calculate face normal
         //Vector3f normal = normalize(crossProduct(edge1, edge2));
         */
-       
+
         // Gets the midpoint of each triangle edge
         //        o
         //      o   o
@@ -190,15 +226,9 @@ void Sphere::Subdivision()
         triangle.push_back(MidPoint(oldTriad[1], oldTriad[2])); // Vertex 2
         triangle.push_back(MidPoint(oldTriad[2], oldTriad[0])); // Vertex 3
 
-        // We're done with the old triangle indices, so we set index to point to the first new one
-        //index += 3u;
-
         // Adds the new vertices to the new list
         for (int j = 0; j < 3; j++)
-        {
-            //auto res = AddVertex(triangle[j]);
-            triad[j] = AddVertex(triangle[j]/*, map*/).first; // Unchecked addition
-        }
+            triad[j] = AddVertex(triangle[j]).first; // Unchecked addition
         
         // Pushes the four new triangles to the end of the new indices list
         tempTriad = { oldTriad[0], triad[0], triad[2] };
@@ -212,7 +242,6 @@ void Sphere::Subdivision()
 
         tempTriad = { triad[0], triad[1], triad[2] };
         indices.push_back(tempTriad);
-        //index += 3u;
     }
 }
 
@@ -359,4 +388,89 @@ std::array<float,3> Sphere::FindCenter()
     center[2] /= vertices.size();
 
     return center;
+}
+
+std::array<float, 3> Sphere::FaceNormal(std::array<float, 3> v1, std::array<float, 3> v2, std::array<float, 3> v3)
+{
+    //float v1[3],v2[3];                      // Vector 1 (x,y,z) & Vector 2 (x,y,z)
+    static const int x = 0;
+    static const int y = 1;
+    static const int z = 2;
+
+    std::array<float, 3> vect1, vect2, out;
+
+    // Finds The Vector Between 2 Points By Subtracting
+    // The x,y,z Coordinates From One Point To Another.
+
+    // Calculate The Vector From Point 1 To Point 0
+    vect1[x] = v1[x] - v2[x];
+    vect1[y] = v1[y] - v2[y];
+    vect1[z] = v1[z] - v2[z];
+
+    // Calculate The Vector From Point 2 To Point 1
+    vect2[x] = v2[x] - v3[x];
+    vect2[y] = v2[y] - v3[y];
+    vect2[z] = v2[z] - v3[z];
+
+    // Uses cross product to get surface normal
+    out[x] = vect1[y] * vect2[z] - vect1[z] * vect2[y];
+    out[y] = vect1[z] * vect2[x] - vect1[x] * vect2[z];
+    out[z] = vect1[x] * vect2[y] - vect1[y] * vect2[x];
+
+    return Normalize(out);
+}
+
+std::array<float, 3> Sphere::Normalize(std::array<float, 3> vector)
+{
+    float length = std::sqrtf(std::powf(vector[0], 2) + std::powf(vector[1], 2) + std::powf(vector[2], 2));
+
+    vector[0] /= length;
+    vector[1] /= length;
+    vector[2] /= length;
+
+    return vector;
+}
+
+std::array<std::array<float, 3>, 3> Sphere::VertexNormal(std::array<float, 3> v1, std::array<float, 3> v2, std::array<float, 3> v3)
+{
+    
+    /*x1,y1,z1
+    x2,y2,z2
+    x3,y3,z3
+
+    Then you can specify a vector which has components
+
+    (x2-x1), (y2-y1), (z2-z1)
+
+    The other vector can be specified as
+
+    (x3-x1), (y3-y1), (z3-z1)
+
+    Then the components of the normal vector can be calculated from
+
+    (y2-y1)(z3-z1)-(z2-z1)(y3-y1)
+    -(x2-x1)(z3-z1)+(z2-z1)(x3-x1)
+    (x2-x1)(y3-y1)-(y2-y1)(x3-x1)*/
+    return {v1, v2, v3};
+}
+
+void Sphere::GenerateNormals()
+{
+    if ( normals.size() > 0 )
+        normals.clear();
+
+    normals.resize(vertices.size());
+    
+    for ( auto tri : indices )
+    {
+        auto result = FaceNormal(vertices[tri[0]], vertices[tri[1]], vertices[tri[2]]);
+
+        normals[tri[0]] = result;
+        normals[tri[1]] = result;
+        normals[tri[2]] = result;
+    }
+
+    // output result
+    //for ( auto normal : normals )
+    //    std::cout << "Normal: (" << normal[0] << ", " << normal[1] << ", " << normal[2] << ")." << std::endl;
 }

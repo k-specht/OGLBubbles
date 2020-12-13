@@ -24,6 +24,7 @@ class Camera
             cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
             cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
             view        = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+            lightPos    = {1.2f, 1.0f, 2.0f};
 
             yaw      = 0.0f;
             pitch    = 0.0f;
@@ -121,6 +122,16 @@ class Camera
             direction.y = sin(glm::radians(pitch));
             direction.z = sin(glm::radians(yaw) ) * cos(glm::radians(pitch));
             cameraFront = glm::normalize(direction);
+
+            // Adds light movement xyz with IJKL
+            if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+                lightPos += cameraSpeed * cameraFront;
+            if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+                lightPos -= cameraSpeed * cameraFront;
+            if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+                lightPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+                lightPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
         };
 
         /**
@@ -133,11 +144,29 @@ class Camera
 
         /**
          *  Gets this Camera's current view (usually called by the Graphics for transforming objects).
-         *  @return The view matrix associated with this Camera.
+         *  @returns The view matrix associated with this Camera.
          */
         glm::mat4 GetView()
         {
             return view;
+        };
+
+        /**
+         *  Gets this Camera's current position in world space.
+         *  @returns The current position of the camera.
+         */
+        glm::vec3 GetCameraPos()
+        {
+            return cameraPos;
+        };
+
+        /**
+         *  Gets the light's current position corresponding to user input.
+         *  @returns The current position of the light.
+         */
+        glm::vec3 GetLightPos()
+        {
+            return lightPos;
         };
 
         /** Gets this Camera's last mouse position in the x direction. */
@@ -154,6 +183,7 @@ class Camera
         glm::vec3 cameraFront;  // Camera front position.
         glm::vec3 cameraUp;     // Camera up position.
         glm::mat4 view;         // The current view matrix.
+        glm::vec3 lightPos;     // Position of the light
         float yaw;              // The current yaw value of the camera.
         float pitch;            // The current pitch value of the camera.
         float lastPosX;         // The last X position of the mouse.
