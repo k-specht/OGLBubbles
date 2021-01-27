@@ -1,10 +1,11 @@
 # OGLBubbles
-An OpenGL project that, when in its final stages, should render bubbles.
+An OpenGL project that aims to create soap bubble lookalikes that move in a realistic manner.
 
-Currently has some major flaws, so if you're reading this and thinking you want to add to my pet project...
-...you should probably wait a month.
+This project is mostly a way for me to learn OpenGL software development, but the final result might be an interesting effect to implement for small games.
 
-Oh well! Eventually it'll be pretty cool, maybe I'll even make it use Vulkan once I get the bubbles up.
+------------------------------------------------------------------------------------------------------------
+
+Check the examples directory for details on the output of this program.
 
 ------------------------------------------------------------------------------------------------------------
 Installation:
