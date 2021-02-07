@@ -29,11 +29,6 @@ class Shader
          *  Every rendering call from this function onward will use this Shader object's shader program.
          */
         void use();
-        
-        // TODO: Delete these bc they're unused
-        //void setBool(const std::string &name, bool value) const;  
-        //void setInt(const std::string &name, int value) const;   
-        //void setFloat(const std::string &name, float value) const;
 };
   
 #endif

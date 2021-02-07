@@ -36,10 +36,6 @@ int main()
         // Process any inputs
         Cam->ProcessInput();
 
-        // Physics - Incomplete, don't use
-        //Gfx->CollisionCheck(Cam->GetX(), Cam->GetY(), Cam->GetMouseVelocity());
-        //Gfx->RegenSphere(0);
-
         // Clear the back buffer before drawing to it
         Gfx->ClearBuffer(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -124,14 +120,6 @@ bool init()
         return false;
     }
     glfwMakeContextCurrent(Window);
-    // Code for adding a window icon
-    /*char[] pix = {};
-    GLFWimage img = {
-        50;
-        50;
-        &pix[0];
-    };
-    glfwSetWindowIcon(Window, 1, &img);*/
 
     if ( !gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) )
     {
@@ -154,15 +142,6 @@ bool init()
     glfwSetFramebufferSizeCallback(Window, framebuffer_size_callback);
     glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Capture: GLFW_CUROR_DISABLED
     glfwSetCursorPosCallback(Window, mouse_move_callback);
-
-    // Creates the window's graphics object
-    /*std::array<float,3> centerPoint;
-    float radius;
-    auto pair   = Center();
-    centerPoint = pair.first;
-    radius      = pair.second;
-    radius *= 2.0f;
-    Gfx = new Graphics(window, Cam, radius);*/
 
     Gfx = new Graphics(Window, Cam, 1.0f);
     if ( Gfx == NULL )

@@ -57,12 +57,11 @@ inline Point findGreatest(Point center, Point points[], int n)
     int maxDistance = -1;
     Point maxPt = center;
 
-    //std::cout << "points: " << sizeof(points[0]) << std::endl;
     // Loop through each point and find the greatest distance
     for (int i = 0; i < n; i++)
     {
         float d = distance(points[i], center);
-        // std::cout << "Distance between {" << points[i].x << ", " << points[i].y << ", " << points[i].z << "} and center: " << d << std::endl;
+
         if ( d > maxDistance )
         {
             maxDistance = d;
@@ -70,11 +69,6 @@ inline Point findGreatest(Point center, Point points[], int n)
         }
     }
 
-    // Debug code that's probably equivalent to "if (points.length <= 1)"
-    //if ( (maxPt.x == center.x) && (maxPt.y == center.y) && (maxPt.z == center.z))
-    //    std::cout << "ERR: greatest distance is center point?" << std::endl;
-
-    //std::cout << "Greatest point in dataset of size " << sizeof(points) - (sizeof(points[0]) / sizeof(float)) << ": {" << maxPt.x << ", " << maxPt.y << ", " << maxPt.z << "}." << std::endl;
     return maxPt;
 };
 
@@ -88,16 +82,13 @@ inline Point findGreatest(Point center, Point points[], int n)
 inline Point findKGreatest(Point center, Point points[], int k)
 {
     // Temporary array
-    // std::vector<Point> pts = std::vector<Point>(points, points + sizeof(points) / sizeof(points[0]));
     std::vector<Point> pts;
     Point greatest;
-    // std::cout << "Size: " << sizeof(points) - (sizeof(points[0]) / sizeof(float)) << std::endl;
     for (int x = 0; x < sizeof(points) - (sizeof(points[0]) / sizeof(float)); x++)
     {
         pts.push_back(points[x]);
     }
 
-    //std::cout << "Point count: " << pts.size() << std::endl;
     // Find k-th furthest point
     for (int i = 0; i < k; i++)
     {
@@ -110,15 +101,10 @@ inline Point findKGreatest(Point center, Point points[], int k)
             if ( pts[j].x == greatest.x && pts[j].y == greatest.y && pts[j].z == greatest.z )
             {
                 pts.erase(pts.begin() + j);
-                //std::cout << "Erased num " << j << " from the list, new size is " << pts.size() << "." << std::endl;
                 j--;
             }
         }
     }
-    
-    // Debug message; if there's an error with k this will probably show up
-    //if ( sizeof(points) - (sizeof(points[0]) / sizeof(float)) == pts.size() ) 
-    //    std::cout << "ERR: Greatest not removed." << std::endl;
 
     return findGreatest(center, pts.data(), pts.size());
 };
@@ -134,11 +120,8 @@ inline Point findCenter(Point points[], int n)
     center = { 0.0f, 0.0f, 0.0f };
 
     // Finds min and max of points
-    //std::cout << "Point count: " << sizeof(points) - (sizeof(points[0]) / sizeof(float)) << std::endl;
     for (int i = 0; i < n; i++)
     {
-        //std::cout << "Iteration: " << i << ", center: {" << center.x << ", " << center.y << ", " << center.z << "}, point: " << std::endl;
-        //std::cout << points[i].x << ", " << points[i].y << ", " << points[i].z << "." << std::endl;
         center.x += points[i].x;
         center.y += points[i].y;
         center.z += points[i].z;
@@ -147,10 +130,6 @@ inline Point findCenter(Point points[], int n)
     center.x /= (sizeof(points) - (sizeof(points[0]) / sizeof(float)));
     center.y /= (sizeof(points) - (sizeof(points[0]) / sizeof(float)));
     center.z /= (sizeof(points) - (sizeof(points[0]) / sizeof(float)));
-
-    //center.x = (max.x + min.x) / 2;
-    //center.y = (max.y + min.y) / 2;
-    //center.z = (max.z + min.z) / 2;
 
     return center;
 };
@@ -169,7 +148,6 @@ inline std::pair<std::array<float,3>, float> Center()
 
     // Read in points
     std::ifstream source("../OGLBubbles/bin/input.txt");
-    //source.open("../OGLBubbles/bin/input.txt", ios::in);
     bool first = true;
     for ( std::string line; std::getline(source, line); )
     {
@@ -187,14 +165,9 @@ inline std::pair<std::array<float,3>, float> Center()
         inp >> point.y;
         inp >> point.z;
 
-        //point.x += 10.0f;
-        //point.y += 10.0f;
-        //point.z += 10.0f;
-
         points.push_back(point);
     }
     source.close();
-    //std::cout << "Point array size: " << points->size() << std::endl;
 
     // Keeps track of circle state
     float oldRadius, originalR;
@@ -207,9 +180,6 @@ inline std::pair<std::array<float,3>, float> Center()
     originalR       = radius;
     oldGreatest     = findGreatest(center, points.data(), points.size());
 
-    // Log original
-    //std::cout << "Original center: {" << center.x << ", " << center.y << ", " << center.z << "}, Original radius: " << radius << std::endl;
-
     // Loop variables
     bool sameX, sameY;
     float aX, aY, magV, check;
@@ -219,7 +189,6 @@ inline std::pair<std::array<float,3>, float> Center()
     // Move circle for each point
     for (int k = 0; k < n; k++)
     {
-        //std::cout << "Index: " << k << endl;
         // Save circle state
         oldRadius = radius;
         oldCenter = center;
@@ -263,19 +232,12 @@ inline std::pair<std::array<float,3>, float> Center()
         // Revert state to previous if radius increased
         if ( oldRadius < radius )
         {
-            //std::cout << "Reverting on k " << k << endl;
-            //cout << "Warn: radius size increased during iteration: " << k << endl;
             radius = oldRadius;
             center = oldCenter;
         }
-        //if ( radius == oldRadius ) break;
-        //if ( k >= points->size() - 1 ) break;
         oldGreatest = findGreatest(center, points.data(), points.size());
     }
 
-    //std::cout << radius << std::endl;
-    //std::cout << "Completed circle centering, new center: {" << center.x << ", " << center.z << ", " << center.y << "}, radius: " << radius << std::endl;
-    //cout << "Previous center: {" << oldCenter.x << ", " << oldCenter.y << "}, previous radius: " << oldRadius << endl;
     std::array<float, 3> cent = {center.x, center.y, center.z};
     return std::make_pair(cent, radius);
 };

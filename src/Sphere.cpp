@@ -270,7 +270,7 @@ std::pair<unsigned int, bool> Sphere::AddVertex(std::array<float,3> vertex/*, Ma
 
     return std::make_pair(vInd, hasV);
 
-    /*
+    /*Hashmap code (OLD), leaving here for future work
     // NOTE: indices[x] doesn't follow this pattern:
     // 0    1    2    3    4    5    6    7    8
     // 0              1              2
@@ -431,24 +431,6 @@ std::array<float, 3> Sphere::Normalize(std::array<float, 3> vector)
 
 std::array<std::array<float, 3>, 3> Sphere::VertexNormal(std::array<float, 3> v1, std::array<float, 3> v2, std::array<float, 3> v3)
 {
-    
-    /*x1,y1,z1
-    x2,y2,z2
-    x3,y3,z3
-
-    Then you can specify a vector which has components
-
-    (x2-x1), (y2-y1), (z2-z1)
-
-    The other vector can be specified as
-
-    (x3-x1), (y3-y1), (z3-z1)
-
-    Then the components of the normal vector can be calculated from
-
-    (y2-y1)(z3-z1)-(z2-z1)(y3-y1)
-    -(x2-x1)(z3-z1)+(z2-z1)(x3-x1)
-    (x2-x1)(y3-y1)-(y2-y1)(x3-x1)*/
     return {v1, v2, v3};
 }
 

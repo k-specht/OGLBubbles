@@ -139,23 +139,6 @@ class Graphics
         void GenerateCluster(int index);
 
         /**
-         *  Generates bindables for a Centroid.
-         *  @param index  - The index of the VAO for this drawable object.
-         *  @param center - The xyz coordinates of the center of this circle.
-         *  @param radius - The radius for this circle.
-         */
-        //void GenerateCentroid(int index, float center[3]), float radius;
-
-
-        /**
-         *  Draws a Centroid.
-         *  @param index  - The index of the VAO for this drawable object.
-         *  @param center - The xyz coordinates of the center of this circle.
-         *  @param radius - The radius for this circle.
-         */
-        //void DrawCentroid(int index, float center[3], float radius);
-
-        /**
          *  Draws a sphere to the screen using the graphics pipeline.
          *  @param index - The index of the VAO for this drawable object.
          */
@@ -236,30 +219,6 @@ class Graphics
          *  @param magnitude - The magnitude of impact force to be applied to this collision event.
          */
         void Collision(std::array<float,3> vertex, float magnitude);
-
-        /**
-         *  Generates normals for the given shape.
-         *  @param vertices - The vertex array of the shape.
-         *  @param indices  - The index array of the shape.
-         *  @returns The combined vertex/normal array in OpenGL format.
-         */
-        //std::vector<float> GenerateNormals(std::vector<float> vertices, std::vector<unsigned int> indices);
-
-        /**
-         *  Generates face normals for the given triangle.
-         *  @param v1 - The first vertex in the triangle.
-         *  @param v2 - The second vertex in the triangle.
-         *  @param v3 - The third vertex in the triangle.
-         *  @returns The face normal of the provided triangle.
-         */
-        //std::array<float, 3> FaceNormal(std::array<float, 3> v1, std::array<float, 3> v2, std::array<float, 3> v3);
-
-        /**
-         *  Normalizes the given vector into unit form.
-         *  @param vector - The vector to normalize.
-         *  @returns The normalized form of the given vector.
-         */
-        //std::array<float, 3> Normalize(std::array<float, 3> vector);
 
     private:
         
