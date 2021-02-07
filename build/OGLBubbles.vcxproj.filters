@@ -4,12 +4,36 @@
     <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\OGLBubbles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\Graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\OGLBLOG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\include\glad\glad.h">
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\OGLBubbles.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\include\GLFW\glfw3.h">
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\Graphics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\Shader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\Sphere.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\OGLBLOG.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\xpech\Documents\Project\OGLBubbles\src\OGLBubblesConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

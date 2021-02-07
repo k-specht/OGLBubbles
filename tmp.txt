@@ -1,1 +1,0 @@
-"${workspaceFolder}\\bin\\${fileBasenameNoExtension}.exe",
