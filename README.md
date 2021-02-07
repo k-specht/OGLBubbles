@@ -24,7 +24,8 @@ Running the Project:
 Make sure that glfw3.dll is in the same directory as the executable, and the shaders folder is in the
 project directory.
 
-Start the executable file and use WASD to move the camera, and IJKL to move the light source.
+Start the executable file and use WASD to move the camera in world space, IJKL to move the light source,
+and the arrow keys to move the camera's viewport.
 
 Notes:
 ------------------------------------------------------------------------------------------------------------
