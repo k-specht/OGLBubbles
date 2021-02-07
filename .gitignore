@@ -35,3 +35,6 @@
 
 # Debugging
 *.dmp
+
+# Builds
+**/build/

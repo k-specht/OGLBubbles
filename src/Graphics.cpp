@@ -171,10 +171,10 @@ void Graphics::EndFrame()
 
 void Graphics::CreateShaders()
 {
-    shaders.push_back(new Shader(".\\shaders\\LightVS.GLSL", ".\\shaders\\LightPS.GLSL"));
+    shaders.push_back(new Shader("..\\shaders\\LightVS.GLSL", "..\\shaders\\LightPS.GLSL"));
     //shaders[0]->use();
 
-    shaders.push_back(new Shader(".\\shaders\\VertexShader.GLSL", ".\\shaders\\PixelShader.GLSL"));
+    shaders.push_back(new Shader("..\\shaders\\VertexShader.GLSL", "..\\shaders\\PixelShader.GLSL"));
     //shaders[1]->use();
     glUniform3f(glGetUniformLocation(shaders[1]->ID, "objectColor"), 1.0f, 1.0f, 1.0f);
     glUniform3f(glGetUniformLocation(shaders[1]->ID, "lightColor" ), 1.0f, 1.0f, 1.0f );

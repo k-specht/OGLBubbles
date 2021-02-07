@@ -26,8 +26,8 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # Configures linux-style package by expanding the @ macros in CSolver.pc.in
-configure_file(src/OGLBubbles.pc.in OGLBubbles.pc @ONLY)
-configure_file(src/OGLBubblesConfig.h.in src/OGLBubblesConfig.h)
+configure_file(src/OGLBubbles.pc.in ${CMAKE_CURRENT_SOURCE_DIR}/src/OGLBubbles.pc @ONLY)
+configure_file(src/OGLBubblesConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/OGLBubblesConfig.h)
 
 # Source binaries to be compiled
 set(SOURCES
@@ -49,6 +49,14 @@ set(HEADERS
     src/Centroid.hpp
     src/OGLBLOG.hpp
     src/OGLBubblesConfig.h
+)
+
+# Shader files
+set(SHADERS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders/LightPS.GLSL
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders/LightVS.GLSL
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders/PixelShader.GLSL
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders/VertexShader.GLSL
 )
 
 #Creates executable
@@ -78,13 +86,6 @@ target_link_libraries(OGLBubbles PRIVATE
                       glfw3.lib
 )
 
-# Unused
-#find_package(OpenGL REQUIRED)
-#target_link_libraries(OGLBubbles OpenGL::GL)
-#add_library(lib/GLFW glfw3dll.lib)
-#add_subdirectory(lib GLFW)
-#target_link_libraries(OGLBubbles PUBLIC lib)
-
 # Sets properties
 set_target_properties(OGLBubbles PROPERTIES VERSION ${PROJECT_VERSION})
 
@@ -99,10 +100,11 @@ install(TARGETS OGLBubbles
         INCLUDES DESTINATION include
         PUBLIC_HEADER DESTINATION include
 )
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/GLFW/glfw3.dll DESTINATION bin)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OGLBubbles.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/lib/GLFW/glfw3.dll DESTINATION bin)
+install(FILES ${SHADERS} DESTINATION shaders)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/OGLBubbles.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 install(FILES
-          "${CMAKE_CURRENT_BINARY_DIR}/OGLBubblesConfig.cmake"
-          "${CMAKE_CURRENT_BINARY_DIR}/OGLBubblesConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/OGLBubblesConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/OGLBubblesConfigVersion.cmake"
         DESTINATION lib/cmake
 )
