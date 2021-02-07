@@ -392,16 +392,13 @@ std::array<float,3> Sphere::FindCenter()
 
 std::array<float, 3> Sphere::FaceNormal(std::array<float, 3> v1, std::array<float, 3> v2, std::array<float, 3> v3)
 {
-    //float v1[3],v2[3];                      // Vector 1 (x,y,z) & Vector 2 (x,y,z)
     static const int x = 0;
     static const int y = 1;
     static const int z = 2;
 
     std::array<float, 3> vect1, vect2, out;
 
-    // Finds The Vector Between 2 Points By Subtracting
-    // The x,y,z Coordinates From One Point To Another.
-
+    // Finds The Vector Between 2 Points
     // Calculate The Vector From Point 1 To Point 0
     vect1[x] = v1[x] - v2[x];
     vect1[y] = v1[y] - v2[y];
@@ -417,7 +414,8 @@ std::array<float, 3> Sphere::FaceNormal(std::array<float, 3> v1, std::array<floa
     out[y] = vect1[z] * vect2[x] - vect1[x] * vect2[z];
     out[z] = vect1[x] * vect2[y] - vect1[y] * vect2[x];
 
-    return Normalize(out);
+    //return Normalize(out);
+    return out;
 }
 
 std::array<float, 3> Sphere::Normalize(std::array<float, 3> vector)

@@ -42,7 +42,7 @@ void main()
     vec3  viewDir    = normalize(viewPos - PixPos);
     vec3  reflectDir = reflect(-lightDir, norm);
 
-    float spec       = pow(max(dot(viewDir, reflectDir), 0.0), 16);
+    float spec       = pow(max(dot(viewDir, reflectDir), 0.0), 4);
     vec3  specular   = specStr * spec * intensity * lightColor;
 
     // Lighting calculation
