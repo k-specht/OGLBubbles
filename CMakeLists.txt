@@ -36,6 +36,7 @@ set(SOURCES
     src/Shader.cpp
     src/Sphere.cpp
     src/OGLBLOG.cpp
+    src/glad.c
 )
 
 # Header files for binaries
@@ -44,6 +45,8 @@ set(HEADERS
     src/Graphics.hpp
     src/Shader.hpp
     src/Sphere.hpp
+    src/Camera.hpp
+    src/Centroid.hpp
     src/OGLBLOG.hpp
     src/OGLBubblesConfig.h
 )
@@ -63,8 +66,16 @@ target_include_directories(OGLBubbles PRIVATE
 
 # Adds link directories to linker
 target_link_directories(OGLBubbles PRIVATE
-                      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib>  
+                      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib>
+                      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/GLFW>
                       $<INSTALL_INTERFACE:lib>
+                      $<INSTALL_INTERFACE:lib/GLFW>
+)
+
+# Adds specific link target libraries 
+target_link_libraries(OGLBubbles PRIVATE
+                      glfw3dll.lib
+                      glfw3.lib
 )
 
 # Unused
@@ -88,6 +99,7 @@ install(TARGETS OGLBubbles
         INCLUDES DESTINATION include
         PUBLIC_HEADER DESTINATION include
 )
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/GLFW/glfw3.dll DESTINATION bin)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OGLBubbles.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 install(FILES
           "${CMAKE_CURRENT_BINARY_DIR}/OGLBubblesConfig.cmake"
