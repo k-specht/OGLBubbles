@@ -17,10 +17,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
-//#include <GLFW/glfw3native.h>
-
 // Local libraries
 #include "OGLBLOG.hpp"
 #include "Shader.hpp"
@@ -135,7 +131,7 @@ void Graphics::CreateShaders()
 {
     shaders.push_back(new Shader("..\\shaders\\LightVS.GLSL", "..\\shaders\\LightPS.GLSL"));
 
-    shaders.push_back(new Shader("..\\shaders\\VertexShader.GLSL", "..\\shaders\\PixelShader.GLSL"));
+    shaders.push_back(new Shader("..\\shaders\\DefaultVertex.GLSL", "..\\shaders\\DefaultPixel.GLSL"));
     glUniform3f(glGetUniformLocation(shaders[1]->ID, "objectColor"), 1.0f, 1.0f, 1.0f);
     glUniform3f(glGetUniformLocation(shaders[1]->ID, "lightColor" ), 1.0f, 1.0f, 1.0f );
     //glUniform3f(glGetUniformLocation(shaders[1]->ID, "lightPos" ), lightPos[0], lightPos[1], lightPos[2] );
